@@ -1,5 +1,5 @@
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 require('dotenv').config();
 
 const sessionConfig = session({
@@ -11,9 +11,9 @@ const sessionConfig = session({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production', // Secure cookies in production
   },
-  store: new MongoStore({
-    url: process.env.MONGO_URI, // MongoDB connection URI
-    collection: 'sessions',
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI, // MongoDB connection URI
+    collectionName: 'sessions',
   }),
 });
 
