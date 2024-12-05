@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold Market | Trading Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/markets.css">
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/user-navbar') %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Market Overview Section -->
+            <div class="col-12 market-header">
+                <h1><i class="fas fa-coins"></i> Gold Market</h1>
+                <div class="market-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Spot Price</span>
+                        <span class="stat-value">$1,892.45/oz</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">24h Change</span>
+                        <span class="text-success stat-value">+0.85%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Trading Volume</span>
+                        <span class="stat-value">245.8K oz</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Content -->
+            <div class="col-12">
+                <div class="card market-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Gold Investment Options</h5>
+                            <div class="market-filters">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm ms-2">
+                                    <i class="fas fa-sort"></i> Sort
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Purity</th>
+                                        <th>Min. Investment</th>
+                                        <th>Storage</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Physical</td>
+                                        <td>24K Gold Bar</td>
+                                        <td>$1,895.20/oz</td>
+                                        <td>99.99%</td>
+                                        <td>1 oz</td>
+                                        <td>Secured Vault</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Buy</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Digital</td>
+                                        <td>Gold ETF</td>
+                                        <td>$189.45</td>
+                                        <td>N/A</td>
+                                        <td>0.1 oz</td>
+                                        <td>Digital</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Trade</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/user-navbar.js"></script>
+    <script src="/js/markets.js"></script>
+</body>
+</html>

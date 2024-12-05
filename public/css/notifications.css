@@ -1,0 +1,355 @@
+/* Notifications Page Styles */
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --text-primary: #000;
+    --text-secondary: #4a5568;
+    --bg-light: #fff;
+    --border-color: #ffffff;
+    --gradient-primary: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+}
+
+.notifications-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header-title p {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.filter-bar {
+    background: white;
+    border: 0px solid;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.form-select {
+    min-width: 150px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.notification-card {
+    background: white;
+    border: 0px solid;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.notification-meta {
+    flex: 1;
+}
+
+.notification-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.notification-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    color: #666;
+}
+
+.badge-type i {
+    font-size: 0.9rem;
+}
+
+.badge-priority {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background-color: #fff3f3;
+    color: #dc3545;
+    border: 1px solid #ffcdd2;
+}
+
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.notification-time {
+    color: #666;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.notification-body {
+    margin: 1rem 0;
+}
+
+.notification-message {
+    margin: 0;
+    color: #444;
+    line-height: 1.5;
+}
+
+.notification-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border: 0px solid;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin: 0;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #666;
+}
+
+.preferences-card {
+    background: white;
+    border: 0px solid;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.preferences-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.preferences-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preferences-body {
+    padding: 1.5rem;
+}
+
+.preference-item {
+    margin-bottom: 1.5rem;
+}
+
+.preference-item:last-child {
+    margin-bottom: 0;
+}
+
+.preference-item small {
+    display: block;
+    margin-top: 0.25rem;
+    margin-left: 2.5rem;
+}
+
+.form-check-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-check-input {
+    cursor: pointer;
+    width: 2.5rem;
+    height: 1.25rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.preferences-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+/* Profile Action Button Styles */
+.profile-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #ffffff;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    width: 100%;
+}
+
+.profile-action-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+    color: white;
+}
+
+.profile-action-btn.small {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    width: auto;
+}
+
+.profile-action-btn.active {
+    background: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .form-select {
+        width: 100%;
+    }
+
+    .notification-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .notification-badges {
+        margin-top: 0.5rem;
+    }
+
+    .notification-time {
+        margin-top: 0.5rem;
+    }
+
+    .notification-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .profile-action-btn {
+        width: 100%;
+    }
+
+    .preferences-card {
+        margin-top: 1.5rem;
+    }
+}

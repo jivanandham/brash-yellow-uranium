@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Profile</h1>
+    <img src="<%= user.picture %>" alt="User Picture" style="width: 150px;">
+    <p>Name: <%= user.name %></p>
+    <p>Email: <%= user.email %></p>
+    <a href="/">Go to Home</a>
+    <a href="/logout">Logout</a>
+  </div>
+  <%- include('partials/footer') %>
+</body>
+</html>

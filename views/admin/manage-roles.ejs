@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Roles</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container my-5">
+    <h1>Manage Roles</h1>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (users && users.length > 0) { %>
+          <% users.forEach((user, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= user.name %></td>
+              <td><%= user.email %></td>
+              <td><%= user.role %></td>
+              <td>
+                <a href="/admin/users/<%= user._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                <a href="/admin/users/<%= user._id %>/delete" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="text-center">No users found.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

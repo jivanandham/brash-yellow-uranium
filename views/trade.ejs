@@ -1,0 +1,34 @@
+<div class="container">
+    <h1>Real-Time Trading</h1>
+  
+    <!-- Search Stock -->
+    <form id="searchStockForm">
+      <input type="text" id="stockSymbol" placeholder="Enter Stock Symbol" required />
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  
+    <div id="stockDetails" class="mt-4"></div>
+  
+    <!-- Buy Stock -->
+    <form action="/trade/buy" method="POST">
+      <input type="hidden" name="symbol" id="buySymbol" />
+      <input type="number" name="amount" placeholder="Enter Quantity" required />
+      <button type="submit" class="btn btn-success">Buy</button>
+    </form>
+  </div>
+  
+  <script>
+    document.getElementById('searchStockForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const symbol = document.getElementById('stockSymbol').value;
+      const response = await fetch(`/trade/price?symbol=${symbol}`);
+      const data = await response.json();
+      document.getElementById('stockDetails').innerHTML = `
+        <p>Symbol: ${data.symbol}</p>
+        <p>Price: $${data.price}</p>
+        <p>Volume: ${data.volume}</p>
+      `;
+      document.getElementById('buySymbol').value = data.symbol;
+    });
+  </script>
+  

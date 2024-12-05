@@ -1,0 +1,221 @@
+/* Transaction History Styles */
+.container {
+    max-width: 1200px;
+    padding: 0 1rem;
+}
+
+.transaction-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2d3748;
+}
+
+.transaction-header h1 {
+    font-weight: 600;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.transaction-header p {
+    color: #666;
+    margin: 0;
+}
+
+.transaction-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.transaction-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.transaction-table th {
+    background: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    padding: 1rem;
+    font-weight: 500;
+}
+
+.transaction-table th:first-child {
+    border-top-left-radius: 5px;
+}
+
+.transaction-table th:last-child {
+    border-top-right-radius: 5px;
+}
+
+.transaction-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.transaction-table tr:last-child td {
+    border-bottom: none;
+}
+
+.transaction-table tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+}
+
+.status-badge.deposit {
+    background: linear-gradient(45deg, #28a745, #218838);
+}
+
+.status-badge.withdraw {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+}
+
+.status-badge.trade {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #999;
+}
+
+.empty-state h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.profile-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.profile-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    color: white;
+    opacity: 0.95;
+}
+
+/* Pagination Styles */
+.pagination-container {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.pagination {
+    gap: 0.25rem;
+}
+
+.page-link {
+    border: none;
+    padding: 0.5rem 1rem;
+    color: #333;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 5px;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: transparent;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .transaction-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .transaction-card {
+        padding: 1rem;
+    }
+
+    .transaction-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .transaction-table td[data-label] {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 0.5rem 1rem;
+    }
+
+    .transaction-table td[data-label]::before {
+        content: attr(data-label);
+        font-weight: 500;
+        margin-right: 1rem;
+    }
+
+    .transaction-table tr {
+        display: block;
+        border-bottom: 1px solid #eee;
+        padding: 0.5rem 0;
+    }
+
+    .transaction-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .profile-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .page-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet - Stock Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user-navbar.css">
+  <link rel="stylesheet" href="/css/wallet.css">
+  <style>
+    body {
+      min-block-size: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    
+    .wallet-container {
+      padding-inline: 2rem;
+      max-inline-size: 1200px;
+      margin-inline: auto;
+    }
+    
+    .wallet-header {
+      text-align: center;
+      margin-block-end: 2rem;
+      color: #2d3748;
+    }
+    
+    .wallet-header h1 {
+      font-weight: 600;
+      font-size: 2.5rem;
+      margin-block-end: 0.5rem;
+    }
+    
+    .balance-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 2rem;
+      color: white;
+      text-align: center;
+      margin-block-end: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .balance-label {
+      font-size: 1.2rem;
+      margin-block-end: 0.5rem;
+      opacity: 0.9;
+    }
+    
+    .balance-amount {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .wallet-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-block-end: 2rem;
+    }
+    
+    .action-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .action-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .action-card h5 {
+      color: #2d3748;
+      font-weight: 600;
+      margin-block-end: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .amount-input {
+      margin-block-end: 1rem;
+    }
+    
+    .form-control {
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .profile-action-btn {
+      inline-size: 100%;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: none;
+      color: white;
+    }
+    
+    .btn-add {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .btn-withdraw {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .profile-action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-block-end: 1rem;
+    }
+    
+    .profile-action-btn {
+      margin-inline-start: 1rem;
+    }
+    
+    .btn-history {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <%- include('partials/user-navbar') %>
+
+  <div class="wallet-container">
+    <div class="wallet-header">
+      <h1><i class="fas fa-wallet me-2"></i>Your Wallet</h1>
+      <div class="header-actions">
+        <a href="/wallet/transaction-history" class="profile-action-btn btn-history">
+          <i class="fas fa-history"></i> Transaction History
+        </a>
+      </div>
+    </div>
+
+    <div class="balance-card">
+      <p class="balance-label">Available Balance</p>
+      <h2 class="balance-amount" id="walletBalance">$<%= user.walletBalance.toFixed(2) %></h2>
+    </div>
+
+    <div class="wallet-actions">
+      <div class="action-card">
+        <h5>
+          <i class="fas fa-plus-circle me-2"></i>
+          Add Funds
+        </h5>
+        <form id="addFundsForm" class="needs-validation" novalidate>
+          <div class="amount-input">
+            <input type="number" step="0.01" class="form-control" id="addFundsAmount" 
+                   name="amount" placeholder="Enter amount (1-100,000)" min="1" max="100000" required>
+            <div class="invalid-feedback">Amount must be between $1 and $100,000.</div>
+          </div>
+          <button type="submit" class="profile-action-btn btn-add">
+            <i class="fas fa-plus me-2"></i> Add Funds
+          </button>
+        </form>
+      </div>
+
+      <div class="action-card">
+        <h5>
+          <i class="fas fa-minus-circle me-2"></i>
+          Withdraw Funds
+        </h5>
+        <form id="withdrawForm" class="needs-validation" novalidate>
+          <div class="amount-input">
+            <input type="number" step="0.01" class="form-control" id="withdrawAmount" 
+                   name="amount" placeholder="Enter amount (1-100,000)" min="1" max="<%= Math.min(user.walletBalance, 100000) %>" required>
+            <div class="invalid-feedback">Amount must be between $1 and $<%= Math.min(user.walletBalance, 100000).toFixed(2) %>.</div>
+          </div>
+          <button type="submit" class="profile-action-btn btn-withdraw">
+            <i class="fas fa-minus me-2"></i> Withdraw Funds
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Form validation
+    (function () {
+      'use strict'
+
+      const forms = document.querySelectorAll('.needs-validation');
+      const walletBalance = document.getElementById('walletBalance');
+      let currentBalance = <%= user.walletBalance %>;
+
+      // Function to update balance display
+      function updateBalanceDisplay(newBalance) {
+        currentBalance = newBalance;
+        walletBalance.textContent = `$${newBalance.toFixed(2)}`;
+        // Update max withdraw amount
+        document.getElementById('withdrawAmount').max = Math.min(newBalance, 100000);
+      }
+
+      // Function to show alert
+      function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.wallet-container').insertBefore(alertDiv, document.querySelector('.balance-card'));
+        
+        // Auto dismiss after 5 seconds
+        setTimeout(() => {
+          alertDiv.remove();
+        }, 5000);
+      }
+
+      // Add Funds form submission
+      const addFundsForm = document.getElementById('addFundsForm');
+      addFundsForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const amount = parseFloat(document.getElementById('addFundsAmount').value);
+        if (isNaN(amount) || amount < 1 || amount > 100000) {
+          showAlert('Amount must be between $1 and $100,000', 'danger');
+          return;
+        }
+
+        try {
+          const response = await fetch('/wallet/add-funds', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ amount })
+          });
+
+          const result = await response.json();
+          
+          if (result.success) {
+            updateBalanceDisplay(result.newBalance);
+            showAlert(`Successfully added $${amount.toFixed(2)} to your wallet`, 'success');
+            addFundsForm.reset();
+          } else {
+            showAlert(result.error || 'Failed to add funds', 'danger');
+          }
+        } catch (error) {
+          showAlert('Failed to add funds. Please try again.', 'danger');
+        }
+      });
+
+      // Withdraw form submission
+      const withdrawForm = document.getElementById('withdrawForm');
+      withdrawForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const amount = parseFloat(document.getElementById('withdrawAmount').value);
+        if (isNaN(amount) || amount < 1 || amount > Math.min(currentBalance, 100000)) {
+          showAlert(`Amount must be between $1 and $${Math.min(currentBalance, 100000).toFixed(2)}`, 'danger');
+          return;
+        }
+
+        try {
+          const response = await fetch('/wallet/withdraw-funds', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ amount })
+          });
+
+          const result = await response.json();
+          
+          if (result.success) {
+            updateBalanceDisplay(result.newBalance);
+            showAlert(`Successfully withdrawn $${amount.toFixed(2)} from your wallet`, 'success');
+            withdrawForm.reset();
+          } else {
+            showAlert(result.error || 'Failed to withdraw funds', 'danger');
+          }
+        } catch (error) {
+          showAlert('Failed to withdraw funds. Please try again.', 'danger');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

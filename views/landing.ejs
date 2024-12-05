@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockBull - Smart Stock Trading Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/header-footer.css">
+    <link rel="stylesheet" href="/css/landing.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1>Master the Market with StockBull</h1>
+                    <p>Experience intelligent stock trading with real-time analytics, advanced portfolio management, and expert insights - all in one platform.</p>
+                    <div class="d-flex gap-3">
+                        <a href="/register" class="btn btn-primary">Get Started</a>
+                        <a href="#features" class="btn btn-outline">Learn More</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="/img/hero-illustration.svg" alt="Trading Platform" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title">About StockBull</h2>
+            <p class="section-subtitle">Your trusted partner in the journey to financial success</p>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="about-card">
+                        <i class="bi bi-shield-check about-icon"></i>
+                        <h3>Secure Trading</h3>
+                        <p>Bank-grade security protocols and real-time monitoring to keep your investments safe.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="about-card">
+                        <i class="bi bi-graph-up about-icon"></i>
+                        <h3>Smart Analytics</h3>
+                        <p>Advanced analytics and AI-powered insights to help you make informed decisions.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="about-card">
+                        <i class="bi bi-people about-icon"></i>
+                        <h3>Expert Support</h3>
+                        <p>24/7 customer support and access to financial experts when you need guidance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section bg-light">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need to succeed in stock trading</p>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="bi bi-lightning-charge feature-icon"></i>
+                        <h3>Real-time Trading</h3>
+                        <p>Execute trades instantly with real-time market data and price alerts.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="bi bi-pie-chart feature-icon"></i>
+                        <h3>Portfolio Analytics</h3>
+                        <p>Track and analyze your portfolio performance with detailed insights.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="bi bi-bell feature-icon"></i>
+                        <h3>Smart Alerts</h3>
+                        <p>Get notified about market opportunities and portfolio changes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="section">
+        <div class="container">
+            <h2 class="section-title">Simple Pricing</h2>
+            <p class="section-subtitle">Choose the plan that fits your trading style</p>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="pricing-card">
+                        <h3>Basic</h3>
+                        <div class="price">$0</div>
+                        <p>Perfect for beginners</p>
+                        <ul class="list-unstyled mb-4">
+                            <li>Basic Market Analysis</li>
+                            <li>Real-time Quotes</li>
+                            <li>Portfolio Tracking</li>
+                            <li>Email Support</li>
+                        </ul>
+                        <a href="/register" class="btn btn-primary w-100">Get Started</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="pricing-card featured">
+                        <h3>Pro</h3>
+                        <div class="price">$29</div>
+                        <p>For active traders</p>
+                        <ul class="list-unstyled mb-4">
+                            <li>Advanced Analytics</li>
+                            <li>Real-time Alerts</li>
+                            <li>Portfolio Optimization</li>
+                            <li>Priority Support</li>
+                        </ul>
+                        <a href="/register" class="btn btn-outline w-100">Get Started</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="pricing-card">
+                        <h3>Enterprise</h3>
+                        <div class="price">$99</div>
+                        <p>For professional traders</p>
+                        <ul class="list-unstyled mb-4">
+                            <li>Custom Analytics</li>
+                            <li>API Access</li>
+                            <li>Dedicated Account Manager</li>
+                            <li>24/7 Phone Support</li>
+                        </ul>
+                        <a href="/register" class="btn btn-primary w-100">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section bg-light">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <p class="section-subtitle">Have questions? We're here to help</p>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="contact-form">
+                        <form>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Your Name">
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Your Email">
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" rows="5" placeholder="Your Message"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

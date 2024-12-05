@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard with Error Logs</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+  <!-- Include Navbar -->
+  <%- include('partials/navbar', { user: user }) %>
+
+  <div class="container mt-5">
+    <div class="row">
+      <!-- Admin Dashboard -->
+      <div class="col-md-4">
+        <h2>Admin Dashboard</h2>
+        <ul class="list-group">
+          <li class="list-group-item"><a href="/admin/users">User Management</a></li>
+          <li class="list-group-item"><a href="/admin/reports">Reports</a></li>
+          <li class="list-group-item"><a href="/admin/settings">Settings</a></li>
+        </ul>
+      </div>
+
+      <!-- Error Logs -->
+      <div class="col-md-8">
+        <h2>Error Logs</h2>
+        <table class="table table-bordered mt-3">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User</th>
+              <th>Error</th>
+              <th>URL</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (errorLogs.length === 0) { %>
+              <tr>
+                <td colspan="5" class="text-center">No error logs found</td>
+              </tr>
+            <% } else { %>
+              <% errorLogs.forEach((log, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= log.userId ? log.userId.name : 'Unknown User' %></td>
+                  <td><%= log.error %></td>
+                  <td><%= log.url %></td>
+                  <td><%= new Date(log.timestamp).toLocaleString() %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

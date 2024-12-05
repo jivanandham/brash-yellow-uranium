@@ -1,0 +1,19 @@
+<table class="table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Activity</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% activities.forEach(activity => { %>
+        <tr>
+          <td><%= activity.userId ? activity.userId.name : 'Unknown User' %></td>
+          <td><%= activity.activity %></td>
+          <td><%= new Date(activity.timestamp).toLocaleString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  

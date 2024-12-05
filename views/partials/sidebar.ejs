@@ -1,0 +1,134 @@
+<!-- Sidebar Navigation -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="https://cdn.glitch.me/8744b9b1-55f9-4d29-8fca-c4b1415d9c43/stockbull.png?v=1731384958477" alt="StockBull Logo" class="sidebar-logo">
+        <h5>StockBull</h5>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/dashboard' ? 'active' : '' %>" href="/dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/portfolio' ? 'active' : '' %>" href="/portfolio">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Portfolio</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/orders' ? 'active' : '' %>" href="/orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/watchlist' ? 'active' : '' %>" href="/watchlist">
+                    <i class="fas fa-star"></i>
+                    <span>Watchlist</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/wallet' ? 'active' : '' %>" href="/wallet">
+                    <i class="fas fa-wallet"></i>
+                    <span>Wallet</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/notifications' ? 'active' : '' %>" href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= path === '/profile' ? 'active' : '' %>" href="/profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<style>
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background: #fff;
+    border-right: 1px solid #e5e5e5;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.sidebar-logo {
+    height: 40px;
+    width: auto;
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.nav-link {
+    padding: 0.75rem 1.5rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #0d6efd;
+    background: #f8f9fa;
+}
+
+.nav-link.active {
+    color: #0d6efd;
+    background: #e7f1ff;
+    border-right: 3px solid #0d6efd;
+}
+
+.nav-link i {
+    width: 20px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add mobile toggle functionality if needed
+    const toggleBtn = document.querySelector('.navbar-toggler');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+    }
+});
+</script>

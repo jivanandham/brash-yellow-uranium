@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f7f6;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    .container {
+      max-inline-size: 1200px;
+      margin-inline: auto;
+      padding-inline: 1rem;
+    }
+
+    /* Enhanced Dashboard Styles */
+    .dashboard-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-header h1 {
+        font-weight: 300;
+        margin-bottom: 0.5rem;
+    }
+
+    .market-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+    }
+
+    .market-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .market-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .market-data .price {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        letter-spacing: -0.5px;
+    }
+
+    .change {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .change.positive {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .change.negative {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .progress {
+        background-color: rgba(0,0,0,0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        transition: width 0.5s ease;
+    }
+
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+    }
+
+    .badge i {
+        font-size: 0.8rem;
+    }
+
+    /* Animation for price updates */
+    @keyframes priceUpdate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    .price-update {
+        animation: priceUpdate 0.5s ease-out;
+    }
+
+    .charts-section .card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .btn-group .btn {
+        border-radius: 20px;
+        padding: 0.375rem 1rem;
+        font-weight: 500;
+    }
+
+    .btn-group .btn.active {
+        background-color: #1a237e;
+        border-color: #1a237e;
+    }
+
+    .watchlist-item {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+        background-color: #fff;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .watchlist-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .news-item {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s ease;
+        background-color: #fff;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .news-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .news-item h6 {
+        color: #1a237e;
+        font-weight: 600;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .market-overview, .charts-section, .watchlist-items, .news-items {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Loading Animation */
+    .loading-indicator {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, #1a237e 0%, #0d47a1 50%, #1a237e 100%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .market-card {
+            margin-bottom: 1rem;
+        }
+        
+        .charts-section .card {
+            margin-bottom: 1rem;
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem 0;
+        }
+        
+        .market-data .price {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Stock Cards Styling */
+    .stock-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .stock-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .stock-info {
+        margin-bottom: 1rem;
+    }
+
+    .stock-chart {
+        height: 60px;
+        margin-top: 1rem;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+
+    .stock-card:hover .stock-chart {
+        opacity: 1;
+    }
+
+    .btn-light {
+        background: rgba(0,0,0,0.05);
+        border: none;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .btn-light:hover {
+        background: rgba(0,0,0,0.1);
+    }
+
+    .btn-light i {
+        font-size: 1rem;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .stock-symbol {
+        font-weight: 600;
+        color: #1a237e;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include User Navbar -->
+  <%- include('partials/navbar') %>
+  <%- include('partials/user-navbar') %>
+
+  <div class="dashboard-header">
+    <div class="container">
+      <h1>Portfolio Overview</h1>
+      <p class="mb-0">Track your investments and market performance</p>
+    </div>
+  </div>
+
+  <div class="container mb-4">
+    <div class="row">
+      <div class="col-md-3 mb-4">
+        <div class="market-card">
+          <div class="card-body">
+            <h6 class="text-muted mb-2">Total Investment</h6>
+            <div class="market-data">
+              <div class="price">$<%= portfolio.totalInvestment.toFixed(2) %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="market-card">
+          <div class="card-body">
+            <h6 class="text-muted mb-2">Market Value</h6>
+            <div class="market-data">
+              <div class="price">$<%= portfolio.totalCurrentValue.toFixed(2) %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="market-card">
+          <div class="card-body">
+            <h6 class="text-muted mb-2">Total Profit/Loss</h6>
+            <div class="market-data">
+              <div class="price <%= portfolio.totalProfitLoss >= 0 ? 'text-success' : 'text-danger' %>">
+                <%= portfolio.totalProfitLoss >= 0 ? '+' : '-' %>$<%= Math.abs(portfolio.totalProfitLoss).toFixed(2) %>
+              </div>
+              <span class="change <%= portfolio.totalProfitLoss >= 0 ? 'positive' : 'negative' %>">
+                <%= portfolio.totalProfitLoss >= 0 ? '+' : '' %><%= portfolio.totalProfitLossPercent.toFixed(2) %>%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="market-card">
+          <div class="card-body">
+            <h6 class="text-muted mb-2">Holdings</h6>
+            <div class="market-data">
+              <div class="price"><%= portfolio.holdings.length %></div>
+              <small class="text-muted">Active Positions</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="market-card">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Current Holdings</h5>
+            <% if (portfolio.holdings.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Symbol</th>
+                      <th>Company</th>
+                      <th>Quantity</th>
+                      <th>Avg. Cost</th>
+                      <th>Current Price</th>
+                      <th>Market Value</th>
+                      <th>Profit/Loss</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% portfolio.holdings.forEach(holding => { %>
+                      <tr>
+                        <td><strong><%= holding.symbol %></strong></td>
+                        <td><%= holding.companyName %></td>
+                        <td><%= holding.quantity %></td>
+                        <td>$<%= (holding.investment / holding.quantity).toFixed(2) %></td>
+                        <td>
+                          $<%= holding.currentPrice.toFixed(2) %>
+                          <span class="badge <%= holding.priceChange >= 0 ? 'bg-success' : 'bg-danger' %>">
+                            <%= holding.priceChange >= 0 ? '+' : '' %><%= holding.priceChange.toFixed(2) %>%
+                          </span>
+                        </td>
+                        <td>$<%= holding.currentValue.toFixed(2) %></td>
+                        <td class="<%= holding.profitLoss >= 0 ? 'text-success' : 'text-danger' %>">
+                          <%= holding.profitLoss >= 0 ? '+' : '-' %>$<%= Math.abs(holding.profitLoss).toFixed(2) %>
+                          <small>(<%= holding.profitLoss >= 0 ? '+' : '' %><%= holding.profitLossPercent.toFixed(2) %>%)</small>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="text-center py-4">
+                <i class="bi bi-bar-chart-line fs-1 text-muted"></i>
+                <p class="mt-3 mb-0">No holdings yet. Start trading to build your portfolio!</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TradingView Charts -->
+  <div class="charts-section mb-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title">Market Overview</h5>
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-primary" data-period="1D">1D</button>
+                  <button type="button" class="btn btn-outline-primary" data-period="1W">1W</button>
+                  <button type="button" class="btn btn-outline-primary active" data-period="1M">1M</button>
+                  <button type="button" class="btn btn-outline-primary" data-period="1Y">1Y</button>
+                </div>
+              </div>
+              <div id="main-chart" style="height: 400px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">S&P 500 Performance</h5>
+              <div id="sp500-chart" style="height: 300px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">NASDAQ Performance</h5>
+              <div id="nasdaq-chart" style="height: 300px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Stocks Section -->
+  <div class="container mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Popular Stocks</h5>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                    <i class="bi bi-plus-lg"></i> Add to Watchlist
+                </button>
+            </div>
+            <div class="stock-carousel">
+                <div class="row">
+                    <!-- Stock Cards -->
+                    <div class="col-md-3 mb-3">
+                        <div class="stock-card">
+                            <div class="stock-info">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h6 class="mb-0">AAPL</h6>
+                                        <small class="text-muted">Apple Inc.</small>
+                                    </div>
+                                    <button class="btn btn-light btn-sm" onclick="toggleWatchlist(this, 'AAPL')">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">$175.84</h5>
+                                    <span class="change positive">+1.45%</span>
+                                </div>
+                            </div>
+                            <div class="stock-chart" id="chart-AAPL"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stock-card">
+                            <div class="stock-info">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h6 class="mb-0">MSFT</h6>
+                                        <small class="text-muted">Microsoft Corp.</small>
+                                    </div>
+                                    <button class="btn btn-light btn-sm" onclick="toggleWatchlist(this, 'MSFT')">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">$376.17</h5>
+                                    <span class="change positive">+0.89%</span>
+                                </div>
+                            </div>
+                            <div class="stock-chart" id="chart-MSFT"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stock-card">
+                            <div class="stock-info">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h6 class="mb-0">GOOGL</h6>
+                                        <small class="text-muted">Alphabet Inc.</small>
+                                    </div>
+                                    <button class="btn btn-light btn-sm" onclick="toggleWatchlist(this, 'GOOGL')">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">$140.42</h5>
+                                    <span class="change negative">-0.32%</span>
+                                </div>
+                            </div>
+                            <div class="stock-chart" id="chart-GOOGL"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stock-card">
+                            <div class="stock-info">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h6 class="mb-0">TSLA</h6>
+                                        <small class="text-muted">Tesla Inc.</small>
+                                    </div>
+                                    <button class="btn btn-light btn-sm" onclick="toggleWatchlist(this, 'TSLA')">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">$248.48</h5>
+                                    <span class="change positive">+2.15%</span>
+                                </div>
+                            </div>
+                            <div class="stock-chart" id="chart-TSLA"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Add Stock Modal -->
+  <div class="modal fade" id="addStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Stock to Watchlist</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="stockSearch" class="form-label">Search Stocks</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="stockSearch" placeholder="Enter stock symbol or company name">
+                        <button class="btn btn-outline-secondary" type="button" id="searchStockBtn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="searchResults" class="list-group">
+                    <!-- Search results will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Watchlist and News Section -->
+  <div class="container mb-4">
+    <div class="row">
+        <!-- Watchlist -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Watchlist</h5>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addToWatchlistModal">
+                        <i class="bi bi-plus"></i> Add Stock
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="watchlist-items">
+                        <div class="watchlist-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                            <div>
+                                <h6 class="mb-0">AAPL</h6>
+                                <small class="text-muted">Apple Inc.</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">$175.84</div>
+                                <small class="text-success">+1.45%</small>
+                            </div>
+                        </div>
+                        <div class="watchlist-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                            <div>
+                                <h6 class="mb-0">MSFT</h6>
+                                <small class="text-muted">Microsoft Corp.</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">$376.17</div>
+                                <small class="text-success">+0.89%</small>
+                            </div>
+                        </div>
+                        <div class="watchlist-item d-flex justify-content-between align-items-center p-2">
+                            <div>
+                                <h6 class="mb-0">GOOGL</h6>
+                                <small class="text-muted">Alphabet Inc.</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">$140.42</div>
+                                <small class="text-danger">-0.32%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market News -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Market News</h5>
+                </div>
+                <div class="card-body">
+                    <div class="news-items">
+                        <div class="news-item mb-3">
+                            <h6 class="mb-1">Fed Signals Potential Rate Cuts in 2024</h6>
+                            <p class="small text-muted mb-1">Federal Reserve officials indicated they expect to cut interest rates next year...</p>
+                            <small class="text-primary">2 hours ago</small>
+                        </div>
+                        <div class="news-item mb-3">
+                            <h6 class="mb-1">Tech Stocks Rally on AI Developments</h6>
+                            <p class="small text-muted mb-1">Major tech companies see gains as artificial intelligence adoption accelerates...</p>
+                            <small class="text-primary">4 hours ago</small>
+                        </div>
+                        <div class="news-item">
+                            <h6 class="mb-1">Oil Prices Stabilize Amid Global Demand</h6>
+                            <p class="small text-muted mb-1">Crude oil prices find stability as global demand shows signs of improvement...</p>
+                            <small class="text-primary">6 hours ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Add to Watchlist Modal -->
+  <div class="modal fade" id="addToWatchlistModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add to Watchlist</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="stockSymbol" class="form-label">Stock Symbol</label>
+                    <input type="text" class="form-control" id="stockSymbol" placeholder="e.g., AAPL">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="addToWatchlistBtn">Add</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Include Footer -->
+  <%- include('partials/footer') %>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  <!-- Add TradingView Widget Script -->
+  <script src="https://s3.tradingview.com/tv.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+  // Initialize TradingView Charts
+  new TradingView.widget({
+      "width": "100%",
+      "height": 400,
+      "symbol": "FOREXCOM:SPXUSD",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "light",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "hide_side_toolbar": false,
+      "allow_symbol_change": true,
+      "container_id": "main-chart"
+  });
+
+  new TradingView.widget({
+      "width": "100%",
+      "height": 300,
+      "symbol": "FOREXCOM:SPXUSD",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "light",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "hide_side_toolbar": true,
+      "container_id": "sp500-chart"
+  });
+
+  new TradingView.widget({
+      "width": "100%",
+      "height": 300,
+      "symbol": "NASDAQ:IXIC",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "light",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "hide_side_toolbar": true,
+      "container_id": "nasdaq-chart"
+  });
+
+  // Enhanced market data update function
+  function updateMarketData() {
+      const markets = {
+          'sp500': { base: 4783.45, volume: 2.5 },
+          'dow': { base: 37248.35, volume: 1.8 },
+          'nasdaq': { base: 15055.65, volume: 3.2 }
+      };
+
+      Object.entries(markets).forEach(([market, data]) => {
+          const change = (Math.random() * 4 - 2).toFixed(2);
+          const price = (data.base * (1 + change/100)).toFixed(2);
+          const volumeChange = (Math.random() * 0.2 - 0.1).toFixed(1);
+          const element = document.getElementById(`${market}-data`);
+          
+          if (element) {
+              // Add animation class
+              const priceElement = element.querySelector('.price');
+              priceElement.classList.add('price-update');
+              
+              // Update price and change
+              setTimeout(() => {
+                  priceElement.textContent = numberWithCommas(price);
+                  priceElement.classList.remove('price-update');
+              }, 100);
+              
+              const changeElement = element.querySelector('.change');
+              changeElement.textContent = `${change > 0 ? '+' : ''}${change}%`;
+              changeElement.className = `change ${change > 0 ? 'positive' : 'negative'}`;
+              
+              // Update volume
+              const volume = (data.volume + parseFloat(volumeChange)).toFixed(1);
+              const volumeElements = element.querySelectorAll('.text-muted');
+              volumeElements[1].textContent = `${volume}B`;
+              
+              // Update progress bar
+              const progressBar = element.querySelector('.progress-bar');
+              const progressWidth = Math.abs(change) * 10 + 40; // Scale the width based on change
+              progressBar.style.width = `${progressWidth}%`;
+              progressBar.className = `progress-bar bg-${change > 0 ? 'success' : 'danger'}`;
+          }
+      });
+  }
+
+  // Format numbers with commas
+  function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // Update data more frequently for a more dynamic feel
+  updateMarketData();
+  setInterval(updateMarketData, 3000);
+
+  // Add hover effect to market cards
+  document.querySelectorAll('.market-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+          card.style.transform = 'translateY(-5px)';
+      });
+      
+      card.addEventListener('mouseleave', () => {
+          card.style.transform = 'translateY(0)';
+      });
+  });
+
+  // Update watchlist prices periodically
+  setInterval(() => {
+    document.querySelectorAll('.watchlist-item').forEach(item => {
+        const price = (Math.random() * 1000).toFixed(2);
+        const change = (Math.random() * 4 - 2).toFixed(2);
+        const isPositive = change > 0;
+        
+        item.querySelector('.fw-bold').textContent = `$${price}`;
+        item.querySelector('small:last-child').textContent = `${isPositive ? '+' : ''}${change}%`;
+        item.querySelector('small:last-child').className = `small text-${isPositive ? 'success' : 'danger'}`;
+    });
+  }, 5000);
+
+  // Initialize stock charts
+  function initializeStockCharts() {
+    const stockSymbols = ['AAPL', 'MSFT', 'GOOGL', 'TSLA'];
+    
+    stockSymbols.forEach(symbol => {
+        const chartData = generateMockChartData();
+        const ctx = document.getElementById(`chart-${symbol}`);
+        if (!ctx) return;
+        
+        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 60);
+        gradient.addColorStop(0, 'rgba(75,192,192,0.2)');
+        gradient.addColorStop(1, 'rgba(75,192,192,0)');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(10).fill(''),
+                datasets: [{
+                    data: chartData,
+                    borderColor: 'rgba(75,192,192,1)',
+                    borderWidth: 2,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+  }
+
+  // Generate mock chart data
+  function generateMockChartData() {
+    return Array.from({length: 10}, () => Math.random() * 100);
+  }
+
+  // Toggle watchlist button
+  function toggleWatchlist(button, symbol) {
+    const icon = button.querySelector('i');
+    if (icon.classList.contains('bi-star')) {
+        icon.classList.replace('bi-star', 'bi-star-fill');
+        button.classList.add('text-warning');
+        showToast(`Added ${symbol} to watchlist`);
+    } else {
+        icon.classList.replace('bi-star-fill', 'bi-star');
+        button.classList.remove('text-warning');
+        showToast(`Removed ${symbol} from watchlist`);
+    }
+  }
+
+  // Show toast notification
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast show position-fixed bottom-0 end-0 m-3';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="toast-header">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+  }
+
+  // Stock search functionality
+  document.getElementById('stockSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toUpperCase();
+    const resultsContainer = document.getElementById('searchResults');
+    
+    if (searchTerm.length < 2) {
+        resultsContainer.innerHTML = '';
+        return;
+    }
+    
+    // Mock search results
+    const mockResults = [
+        { symbol: 'AAPL', name: 'Apple Inc.' },
+        { symbol: 'MSFT', name: 'Microsoft Corporation' },
+        { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+        { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+        { symbol: 'TSLA', name: 'Tesla Inc.' }
+    ].filter(stock => 
+        stock.symbol.includes(searchTerm) || 
+        stock.name.toUpperCase().includes(searchTerm)
+    );
+    
+    resultsContainer.innerHTML = mockResults.map(stock => `
+        <div class="list-group-item list-group-item-action" onclick="addToWatchlist('${stock.symbol}', '${stock.name}')">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="stock-symbol">${stock.symbol}</span>
+                    <small class="text-muted d-block">${stock.name}</small>
+                </div>
+                <i class="bi bi-plus-circle"></i>
+            </div>
+        </div>
+    `).join('');
+  });
+
+  // Add stock to watchlist
+  function addToWatchlist(symbol, name) {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addStockModal'));
+    modal.hide();
+    showToast(`Added ${symbol} to watchlist`);
+    
+    // In a real app, you would:
+    // 1. Make an API call to add the stock to the user's watchlist
+    // 2. Update the UI to show the new stock
+    // 3. Start tracking the stock's price updates
+  }
+
+  // Initialize charts when the page loads
+  document.addEventListener('DOMContentLoaded', initializeStockCharts);
+  </script>
+</body>
+</html>

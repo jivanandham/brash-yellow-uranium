@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user-navbar.css">
+</head>
+<body>
+  <!-- User Dashboard Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+      
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <!-- Main Navigation -->
+        <li class="nav-item">
+          <a class="nav-link" href="/dashboard">
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/portfolio">
+            <i class="fas fa-chart-line"></i> Portfolio
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/orders">
+            <i class="fas fa-shopping-cart"></i> Orders
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/watchlist">
+            <i class="fas fa-star"></i> Watchlist
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/wallet">
+            <i class="fas fa-wallet"></i> Wallet
+            <span class="wallet-balance ms-2">$<%= typeof user !== 'undefined' && user.walletBalance ? user.walletBalance.toFixed(2) : '0.00' %></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/notifications">
+            <i class="fas fa-bell"></i> Notifications
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/profile">
+            <i class="fas fa-user"></i> Profile
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Add active class to current nav item
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+
+      // Search functionality
+      const searchInput = document.querySelector('.search-input');
+      if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const query = this.value.trim();
+            if (query) {
+              window.location.href = `/search?q=${encodeURIComponent(query)}`;
+            }
+          }
+        });
+      }
+
+      // Mark all notifications as read
+      const markAllRead = document.querySelector('.mark-all-read');
+      if (markAllRead) {
+        markAllRead.addEventListener('click', function() {
+          const unreadItems = document.querySelectorAll('.notification-item.unread');
+          unreadItems.forEach(item => {
+            item.classList.remove('unread');
+          });
+          document.querySelector('.notification-badge').style.display = 'none';
+        });
+      }
+    });
+  </script>
+</body>
+</html>

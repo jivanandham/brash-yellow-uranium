@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Stock Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header-footer.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/user-navbar.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <%- include('partials/user-navbar') %>
+
+    <div class="notifications-container">
+        <div class="page-header">
+            <div class="header-title">
+                <h1><i class="fas fa-bell"></i> Notifications</h1>
+                <p class="text-muted">Stay updated with your account activities</p>
+            </div>
+            <div class="header-actions">
+                <button class="profile-action-btn" onclick="markAllAsRead()">
+                    <i class="fas fa-check-double"></i> Mark All as Read
+                </button>
+                <button class="profile-action-btn" onclick="refreshNotifications()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <button class="profile-action-btn small active" onclick="filterNotifications('all')">
+                    <i class="fas fa-list"></i> All
+                </button>
+                <button class="profile-action-btn small" onclick="filterNotifications('unread')">
+                    <i class="fas fa-envelope"></i> Unread
+                </button>
+                <button class="profile-action-btn small" onclick="filterNotifications('read')">
+                    <i class="fas fa-envelope-open"></i> Read
+                </button>
+            </div>
+            <div class="filter-group">
+                <select class="form-select" id="typeFilter" onchange="filterByType(this.value)">
+                    <option value="all">All Types</option>
+                    <option value="price">Price Alerts</option>
+                    <option value="order">Order Updates</option>
+                    <option value="system">System</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Notifications Column -->
+            <div class="col-md-8">
+                <% if (notifications && notifications.length > 0) { %>
+                    <% notifications.forEach(notification => { %>
+                        <div class="notification-card <%= notification.status === 'unread' ? 'unread' : '' %> <%= notification.type.toLowerCase() %>">
+                            <div class="notification-header">
+                                <div class="notification-meta">
+                                    <h3 class="notification-title"><%= notification.title %></h3>
+                                    <div class="notification-badges">
+                                        <span class="badge-type <%= notification.type.toLowerCase() %>">
+                                            <i class="<%= notification.type === 'price' ? 'fas fa-chart-line' : 
+                                                       notification.type === 'order' ? 'fas fa-shopping-cart' : 
+                                                       'fas fa-info-circle' %>"></i>
+                                            <%= notification.type %>
+                                        </span>
+                                        <% if (notification.priority === 'high') { %>
+                                            <span class="badge-priority">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                High Priority
+                                            </span>
+                                        <% } %>
+                                        <% if (notification.status === 'unread') { %>
+                                            <span class="badge-status">
+                                                <i class="fas fa-circle"></i>
+                                                New
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="notification-time">
+                                    <i class="fas fa-clock"></i> <%= new Date(notification.createdAt).toLocaleString() %>
+                                </div>
+                            </div>
+                            <div class="notification-body">
+                                <p class="notification-message"><%= notification.message %></p>
+                            </div>
+                            <div class="notification-footer">
+                                <div class="notification-actions">
+                                    <% if (notification.link) { %>
+                                        <a href="<%= notification.link %>" class="profile-action-btn small">
+                                            <i class="fas fa-external-link-alt"></i> View Details
+                                        </a>
+                                    <% } %>
+                                    <% if (notification.status === 'unread') { %>
+                                        <button class="profile-action-btn small" onclick="markAsRead('<%= notification._id %>')">
+                                            <i class="fas fa-check"></i> Mark as Read
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No Notifications</h3>
+                        <p>You're all caught up! Check back later for updates.</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Preferences Column -->
+            <div class="col-md-4">
+                <div class="preferences-card">
+                    <div class="preferences-header">
+                        <h3><i class="fas fa-cog"></i> Notification Settings</h3>
+                    </div>
+                    <div class="preferences-body">
+                        <div class="preference-item">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="priceAlerts" checked>
+                                <label class="form-check-label" for="priceAlerts">
+                                    <i class="fas fa-chart-line"></i> Price Alerts
+                                </label>
+                            </div>
+                            <small class="text-muted">Get notified about significant price changes</small>
+                        </div>
+                        <div class="preference-item">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="orderUpdates" checked>
+                                <label class="form-check-label" for="orderUpdates">
+                                    <i class="fas fa-shopping-cart"></i> Order Updates
+                                </label>
+                            </div>
+                            <small class="text-muted">Stay informed about your order status</small>
+                        </div>
+                        <div class="preference-item">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="systemNotifications" checked>
+                                <label class="form-check-label" for="systemNotifications">
+                                    <i class="fas fa-server"></i> System Notifications
+                                </label>
+                            </div>
+                            <small class="text-muted">Important system updates and maintenance</small>
+                        </div>
+                        <div class="preference-item">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                <label class="form-check-label" for="emailNotifications">
+                                    <i class="fas fa-envelope"></i> Email Notifications
+                                </label>
+                            </div>
+                            <small class="text-muted">Receive notifications via email</small>
+                        </div>
+                    </div>
+                    <div class="preferences-footer">
+                        <button class="profile-action-btn" onclick="savePreferences()">
+                            <i class="fas fa-save"></i> Save Preferences
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function markAsRead(notificationId) {
+            fetch(`/notifications/read/${notificationId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                    notification.classList.remove('unread');
+                    updateUnreadCount();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function markAllAsRead() {
+            fetch('/notifications/read-all', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.notification-card.unread').forEach(card => {
+                        card.classList.remove('unread');
+                    });
+                    updateUnreadCount();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function refreshNotifications() {
+            window.location.reload();
+        }
+
+        function filterNotifications(status) {
+            console.log('Filtering notifications by status:', status);
+            // Add filter logic here
+            document.querySelectorAll('.filter-group .profile-action-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function filterByType(type) {
+            console.log('Filtering notifications by type:', type);
+            // Add type filter logic here
+        }
+
+        function savePreferences() {
+            const preferences = {
+                email: document.getElementById('emailNotifications').checked,
+                push: document.getElementById('pushNotifications').checked,
+                priceAlerts: document.getElementById('priceAlerts').checked,
+                orderUpdates: document.getElementById('orderUpdates').checked,
+                newsAlerts: document.getElementById('newsAlerts').checked
+            };
+
+            // You would typically save these to the server
+            alert('Preferences saved successfully!');
+        }
+
+        function loadPreferences() {
+            fetch('/notifications/preferences')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const prefs = data.preferences;
+                        document.getElementById('emailNotifications').checked = prefs.email;
+                        document.getElementById('pushNotifications').checked = prefs.push;
+                        document.getElementById('priceAlerts').checked = prefs.priceAlerts;
+                        document.getElementById('orderUpdates').checked = prefs.orderUpdates;
+                        document.getElementById('newsAlerts').checked = prefs.newsAlerts;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateUnreadCount() {
+            fetch('/notifications/count')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.querySelector('#notificationBadge');
+                        if (badge) {
+                            badge.textContent = data.unreadCount;
+                            if (data.unreadCount === 0) {
+                                badge.style.display = 'none';
+                            } else {
+                                badge.style.display = 'inline';
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPreferences);
+    </script>
+</body>
+</html>

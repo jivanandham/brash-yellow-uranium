@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Transaction History - Stock Dashboard</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/header-footer.css">
+        <link rel="stylesheet" href="/css/navbar.css">
+        <link rel="stylesheet" href="/css/user-navbar.css">
+        <link rel="stylesheet" href="/css/transaction-history.css">
+        <style>
+          body {
+            min-block-size: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+          }
+        </style>
+    </head>
+<body>
+  <%- include('partials/navbar') %>
+  <%- include('partials/user-navbar') %>
+
+  <div class="container">
+    <div class="transaction-header d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-history me-2"></i>Transaction History</h1>
+        <p class="text-muted">Track all your wallet activities</p>
+      </div>
+      <a href="/wallet" class="profile-action-btn">
+        <i class="fas fa-wallet"></i>
+        Back to Wallet
+      </a>
+    </div>
+
+    <div class="transaction-card">
+      <% if (transactions && transactions.length > 0) { %>
+        <div class="table-responsive">
+          <table class="transaction-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% transactions.forEach((txn, index) => { %>
+                <tr>
+                  <td data-label="#">
+                    <%= (currentPage - 1) * 10 + index + 1 %>
+                  </td>
+                  <td data-label="Type">
+                    <span class="status-badge <%= txn.type %>">
+                      <% if (txn.type === 'trade') { %>
+                        <i class="fas <%= txn.tradeType === 'buy' ? 'fa-shopping-cart' : 'fa-dollar-sign' %> me-1"></i>
+                        <%= txn.tradeType === 'buy' ? 'Buy' : 'Sell' %>
+                      <% } else { %>
+                        <i class="fas <%= txn.type === 'deposit' ? 'fa-arrow-down' : 'fa-arrow-up' %> me-1"></i>
+                        <%= txn.type.charAt(0).toUpperCase() + txn.type.slice(1) %>
+                      <% } %>
+                    </span>
+                  </td>
+                  <td data-label="Amount">
+                    <strong class="<%= txn.type === 'deposit' || (txn.type === 'trade' && txn.tradeType === 'sell') ? 'text-success' : 'text-danger' %>">
+                      <%= txn.type === 'deposit' || (txn.type === 'trade' && txn.tradeType === 'sell') ? '+' : '-' %>$<%= Math.abs(txn.amount).toFixed(2) %>
+                    </strong>
+                  </td>
+                  <td data-label="Description">
+                    <% if (txn.type === 'trade') { %>
+                      <div>
+                        <strong class="me-2"><%= txn.stockSymbol %></strong>
+                        <%= txn.description %>
+                      </div>
+                    <% } else { %>
+                      <%= txn.description || 'N/A' %>
+                    <% } %>
+                  </td>
+                  <td data-label="Date">
+                    <%= new Date(txn.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if (totalPages > 1) { %>
+          <div class="pagination-container mt-4">
+            <nav aria-label="Transaction history pagination">
+              <ul class="pagination justify-content-center">
+                <% if (hasPrevPage) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/wallet/transaction-history?page=<%= currentPage - 1 %>" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                <% } %>
+
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="/wallet/transaction-history?page=<%= i %>"><%= i %></a>
+                  </li>
+                <% } %>
+
+                <% if (hasNextPage) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/wallet/transaction-history?page=<%= currentPage + 1 %>" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="empty-state">
+          <i class="fas fa-receipt"></i>
+          <h4>No Transactions Yet</h4>
+          <p>Your transaction history will appear here once you start using your wallet.</p>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <%- include('partials/footer') %>
+</body>
+</html>

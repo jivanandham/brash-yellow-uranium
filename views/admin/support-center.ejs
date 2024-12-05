@@ -1,0 +1,144 @@
+<%- include('../partials/admin-navbar') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-life-ring me-2"></i>Support Center</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTicketModal">
+                    <i class="fas fa-plus me-2"></i>Create New Ticket
+                </button>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Open Tickets</h5>
+                            <h2 class="mb-0"><%= openTickets || 0 %></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Resolved</h5>
+                            <h2 class="mb-0"><%= resolvedTickets || 0 %></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending</h5>
+                            <h2 class="mb-0"><%= pendingTickets || 0 %></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Avg Response Time</h5>
+                            <h2 class="mb-0"><%= avgResponseTime || '24h' %></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Knowledge Base</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="kb-category">
+                                <i class="fas fa-book mb-3 fa-2x"></i>
+                                <h5>Getting Started</h5>
+                                <p>Basic guides and tutorials</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kb-category">
+                                <i class="fas fa-cogs mb-3 fa-2x"></i>
+                                <h5>Configuration</h5>
+                                <p>System settings and setup</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kb-category">
+                                <i class="fas fa-shield-alt mb-3 fa-2x"></i>
+                                <h5>Security</h5>
+                                <p>Security best practices</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Ticket Modal -->
+<div class="modal fade" id="createTicketModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Support Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/admin/tickets/create" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="category" required>
+                            <option value="technical">Technical Issue</option>
+                            <option value="billing">Billing</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" name="priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.kb-category {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.kb-category:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+</style>
+
+<%- include('../partials/footer') %>

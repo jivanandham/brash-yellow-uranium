@@ -1,0 +1,18 @@
+<div class="container my-5">
+    <h1>Manage User Roles</h1>
+    <form action="/admin/users/roles" method="POST">
+      <div class="mb-3">
+        <label for="email" class="form-label">User Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="role" class="form-label">New Role</label>
+        <select class="form-control" id="role" name="role" required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Update Role</button>
+    </form>
+  </div>
+  

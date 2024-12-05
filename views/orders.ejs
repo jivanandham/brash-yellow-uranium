@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/header-footer.css">
+    <link rel="stylesheet" href="/css/orders.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <% if (isAuthenticated) { %>
+        <%- include('partials/user-navbar') %>
+    <% } %>
+
+    <div class="orders-container">
+        <!-- Hidden wallet balance for JavaScript use -->
+        <div class="d-none">
+            <span class="wallet-balance">$<%= typeof user.walletBalance !== 'undefined' ? user.walletBalance.toFixed(2) : '0.00' %></span>
+        </div>
+
+        <div class="container mt-4">
+            <div class="row mb-4">
+                <div class="col">
+                    <h2>Order History</h2>
+                </div>
+                <div class="col-auto">
+                    <div class="balance-display">
+                        <i class="fas fa-wallet"></i>
+                        Available Balance: <span class="fw-bold text-success">$<%= typeof user.walletBalance !== 'undefined' ? user.walletBalance.toFixed(2) : '0.00' %></span>
+                    </div>
+                </div>
+            </div>
+
+            <% if (error) { %>
+                <div class="alert alert-danger">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <% if (orders && orders.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Stock</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach(function(order) { %>
+                                <tr class="<%= order.type === 'buy' ? 'table-success-light' : 'table-danger-light' %>">
+                                    <td><%= new Date(order.orderDate).toLocaleString() %></td>
+                                    <td>
+                                        <strong><%= order.symbol %></strong>
+                                        <% if (order.companyName) { %>
+                                            <br><small class="text-muted"><%= order.companyName %></small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= order.type === 'buy' ? 'bg-success' : 'bg-danger' %>">
+                                            <i class="fas <%= order.type === 'buy' ? 'fa-shopping-cart' : 'fa-dollar-sign' %> me-1"></i>
+                                            <%= order.type.toUpperCase() %>
+                                        </span>
+                                    </td>
+                                    <td><%= order.quantity %></td>
+                                    <td>$<%= order.price.toFixed(2) %></td>
+                                    <td class="<%= order.type === 'buy' ? 'text-danger' : 'text-success' %>">
+                                        <%= order.type === 'buy' ? '-' : '+' %>$<%= order.total.toFixed(2) %>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= order.status === 'completed' ? 'bg-success' : 'bg-warning' %>">
+                                            <%= order.status.toUpperCase() %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h4>No Orders Yet</h4>
+                    <p class="text-muted">Start trading to see your order history here.</p>
+                    <a href="/watchlist" class="btn btn-primary">
+                        <i class="fas fa-chart-line"></i> Go to Watchlist
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Filter orders
+        document.getElementById('typeFilter').addEventListener('change', filterOrders);
+        document.getElementById('statusFilter').addEventListener('change', filterOrders);
+
+        function filterOrders() {
+            const type = document.getElementById('typeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            fetch(`/orders/filter?type=${type}&status=${status}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateOrdersList(data.orders);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateOrdersList(orders) {
+            const tbody = document.querySelector('tbody');
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center">No orders found</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => `
+                <tr class="${order.type === 'buy' ? 'table-success' : 'table-danger'}">
+                    <td>${new Date(order.createdAt).toLocaleString()}</td>
+                    <td>
+                        <span class="badge ${order.type === 'buy' ? 'bg-success' : 'bg-danger'}">
+                            ${order.type.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>${order.symbol}</td>
+                    <td>${order.companyName}</td>
+                    <td>${order.quantity}</td>
+                    <td>$${order.price.toFixed(2)}</td>
+                    <td>$${order.total.toFixed(2)}</td>
+                    <td>
+                        <span class="badge bg-${order.status === 'completed' ? 'success' : (order.status === 'pending' ? 'warning' : 'secondary')}">
+                            ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+    <%- include('partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<% include ../partials/navbar %>
+<div class="container">
+  <h1>Sessions for <%= user.name %></h1>
+  <% if (userSessions.length > 0) { %>
+    <ul class="list-group">
+      <% userSessions.forEach((session, index) => { %>
+        <li class="list-group-item">
+          Session ID: <%= session._id %><br>
+          Expires: <%= new Date(session.expires).toLocaleString() %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No active sessions found.</p>
+  <% } %>
+</div>

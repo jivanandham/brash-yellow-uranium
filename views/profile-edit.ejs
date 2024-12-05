@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user-navbar.css">
+  <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  <%- include('partials/user-navbar') %>
+  
+  <div class="profile-container">
+    <% if (messages && messages.error && messages.error.length > 0) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= messages.error[0] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+    
+    <% if (messages && messages.success && messages.success.length > 0) { %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= messages.success[0] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+
+    <div class="profile-card">
+      <div class="profile-header">
+        <h2><i class="fas fa-user-edit"></i> Edit Profile</h2>
+      </div>
+      
+      <div class="profile-content">
+        <!-- Left side: Edit Form -->
+        <div class="profile-info">
+          <div class="info-section">
+            <div class="info-title">
+              <i class="fas fa-user"></i> Personal Information
+            </div>
+            <form action="/profile/edit" method="POST">
+              <div class="info-item">
+                <label for="name" class="info-label">Name</label>
+                <input type="text" id="name" name="name" class="form-control info-value" value="<%= user.name %>" required>
+              </div>
+              
+              <div class="info-item">
+                <label for="bio" class="info-label">Bio</label>
+                <textarea id="bio" name="bio" class="form-control info-value" rows="3" 
+                  placeholder="Tell us something about yourself..."><%= user.bio || '' %></textarea>
+              </div>
+              
+              <div class="info-item">
+                <label for="contactNumber" class="info-label">Contact Number</label>
+                <input type="tel" id="contactNumber" name="contactNumber" class="form-control info-value" 
+                  value="<%= user.contactNumber || '' %>">
+              </div>
+              
+              <div class="button-group">
+                <button type="submit" class="profile-action-btn">
+                  <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="/profile" class="profile-action-btn">
+                  <i class="fas fa-times"></i> Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right side: Profile Picture -->
+        <div class="profile-img-section">
+          <div class="profile-img-container">
+            <img src="<%= user.picture || '/default-profile.png' %>" alt="Profile Picture" class="profile-img">
+          </div>
+          <div class="profile-actions">
+            <div class="button-group">
+              <form action="/profile/photo" method="POST" enctype="multipart/form-data">
+                <label class="photo-upload-btn profile-action-btn">
+                  <i class="fas fa-camera"></i> Update Photo
+                  <input type="file" name="profilePhoto" accept="image/*" style="display: none;" onchange="this.form.submit()">
+                </label>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <%- include('partials/footer') %>
+</body>
+</html>

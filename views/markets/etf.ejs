@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETF Market | Trading Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/markets.css">
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/user-navbar') %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Market Overview Section -->
+            <div class="col-12 market-header">
+                <h1><i class="fas fa-layer-group"></i> ETF Market</h1>
+                <div class="market-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total AUM</span>
+                        <span class="stat-value">$7.2T</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">24h Volume</span>
+                        <span class="stat-value">$52.3B</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Active ETFs</span>
+                        <span class="stat-value">2,845</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Content -->
+            <div class="col-12">
+                <div class="card market-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Popular ETFs</h5>
+                            <div class="market-filters">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm ms-2">
+                                    <i class="fas fa-sort"></i> Sort
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>24h Change</th>
+                                        <th>AUM</th>
+                                        <th>Expense Ratio</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SPY</td>
+                                        <td>SPDR S&P 500 ETF Trust</td>
+                                        <td>$452.85</td>
+                                        <td class="text-success">+1.24%</td>
+                                        <td>$375.2B</td>
+                                        <td>0.09%</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Trade</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>QQQ</td>
+                                        <td>Invesco QQQ Trust</td>
+                                        <td>$378.45</td>
+                                        <td class="text-danger">-0.85%</td>
+                                        <td>$195.8B</td>
+                                        <td>0.20%</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Trade</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/user-navbar.js"></script>
+    <script src="/js/markets.js"></script>
+</body>
+</html>

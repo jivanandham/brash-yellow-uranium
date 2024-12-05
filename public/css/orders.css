@@ -1,0 +1,67 @@
+.orders-container {
+    padding: 20px;
+}
+
+.balance-display {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.balance-display i {
+    color: #198754;
+    margin-right: 8px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+
+.badge i {
+    margin-right: 4px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.empty-state i {
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.empty-state .btn {
+    margin-top: 15px;
+}
+
+.table-success-light {
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+.table-danger-light {
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+.table tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
