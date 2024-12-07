@@ -3,8 +3,38 @@ const helmet = require('helmet');
 const helmetConfig = helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: ["'self'"],  // Only allow content from the same origin
-    scriptSrc: ["'self'", "'unsafe-inline'", "https://apis.google.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"], // Allow inline scripts and external sources
-    styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"], // Allow inline styles and external styles
+    scriptSrc: [
+      "'self'", 
+      "'unsafe-inline'", 
+      "'unsafe-eval'",
+      "https://apis.google.com", 
+      "https://cdn.jsdelivr.net", 
+      "https://cdnjs.cloudflare.com",
+      "https://code.jquery.com",
+      "blob:"
+    ],
+    scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
+    scriptSrcElem: [
+      "'self'",
+      "'unsafe-inline'",
+      "https://apis.google.com",
+      "https://cdn.jsdelivr.net",
+      "https://cdnjs.cloudflare.com",
+      "https://code.jquery.com",
+      "blob:"
+    ],
+    styleSrc: [
+      "'self'", 
+      "'unsafe-inline'", 
+      "https://cdnjs.cloudflare.com",
+      "https://cdn.jsdelivr.net"
+    ],
+    styleSrcElem: [
+      "'self'",
+      "'unsafe-inline'",
+      "https://cdnjs.cloudflare.com",
+      "https://cdn.jsdelivr.net"
+    ],
     imgSrc: [
       "'self'", 
       "data:", 
@@ -15,8 +45,17 @@ const helmetConfig = helmet.contentSecurityPolicy({
       "blob:",
       "*"
     ],
-    connectSrc: ["'self'", "https://www.google-analytics.com"], 
-    fontSrc: ["'self'", "https://cdnjs.cloudflare.com"], 
+    connectSrc: [
+      "'self'", 
+      "https://www.google-analytics.com",
+      "wss://*",
+      "ws://*"
+    ],
+    fontSrc: [
+      "'self'", 
+      "https://cdnjs.cloudflare.com",
+      "https://cdn.jsdelivr.net"
+    ],
     objectSrc: ["'none'"],
     mediaSrc: ["'self'"],
     frameSrc: ["'none'"],

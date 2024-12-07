@@ -6,13 +6,12 @@ const transactionSchema = new mongoose.Schema({
         required: true 
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,  // Changed from ObjectId to String to support Auth0 IDs
         required: true
     },
     type: { 
         type: String, 
-        enum: ['deposit', 'withdraw', 'buy', 'sell'], 
+        enum: ['deposit', 'withdraw', 'stock_buy', 'stock_sell'], 
         required: true 
     },
     amount: { 
@@ -30,27 +29,27 @@ const transactionSchema = new mongoose.Schema({
     stockSymbol: { 
         type: String,
         required: function() { 
-            return this.type === 'buy' || this.type === 'sell';
+            return this.type === 'stock_buy' || this.type === 'stock_sell';
         }
     },
     quantity: {
         type: Number,
         required: function() {
-            return this.type === 'buy' || this.type === 'sell';
+            return this.type === 'stock_buy' || this.type === 'stock_sell';
         },
         min: 0
     },
     price: {
         type: Number,
         required: function() {
-            return this.type === 'buy' || this.type === 'sell';
+            return this.type === 'stock_buy' || this.type === 'stock_sell';
         },
         min: 0
     },
     total: {
         type: Number,
         required: function() {
-            return this.type === 'buy' || this.type === 'sell';
+            return this.type === 'stock_buy' || this.type === 'stock_sell';
         }
     },
     status: {
@@ -68,7 +67,7 @@ const transactionSchema = new mongoose.Schema({
 
 // Calculate total value before saving
 transactionSchema.pre('save', function(next) {
-    if (this.type === 'buy' || this.type === 'sell') {
+    if (this.type === 'stock_buy' || this.type === 'stock_sell') {
         this.total = this.quantity * this.price;
     }
     next();

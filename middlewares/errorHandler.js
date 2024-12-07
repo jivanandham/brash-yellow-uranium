@@ -9,7 +9,7 @@ const errorHandler = async (err, req, res, next) => {
             error: err.message || 'Unknown error',
             stack: err.stack || '',
             url: req.originalUrl || req.url || '',
-            userId: req.user ? req.user._id : null,
+            userId: req.oidc && req.oidc.user ? req.oidc.user.sub : null,  // Use Auth0 user ID
             timestamp: new Date()
         });
         await errorLog.save();

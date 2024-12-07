@@ -73,29 +73,23 @@ class StockPriceService {
 
     async getQuote(symbol) {
         try {
-            if (!symbol) {
-                throw new Error('Symbol is required');
-            }
-
-            // Check global cache first
-            const globalCachedData = this.globalQuoteCache.get(symbol);
-            if (globalCachedData && Date.now() - globalCachedData.timestamp < this.globalCacheTimeout) {
-                return globalCachedData.data;
-            }
-
-            // Check regular cache
-            const cachedData = this.cache.get(symbol);
-            if (cachedData && Date.now() - cachedData.timestamp < this.cacheTimeout) {
-                this.globalQuoteCache.set(symbol, cachedData);
-                return cachedData.data;
-            }
-
-            // Get stock from database as fallback
-            let stock = await Stock.findOne({ symbol: symbol.toUpperCase() });
+            console.log(`Fetching quote for symbol: ${symbol}`);
             
-            // Fetch fresh data with rate limiting
+            // Check cache first
+            const cached = this.cache.get(symbol);
+            if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+                console.log(`Using cached data for ${symbol}:`, cached.data);
+                return cached.data;
+            }
+
+            // Get last known price from database
+            const stock = await Stock.findOne({ symbol: symbol.toUpperCase() });
+            console.log(`Last known stock data for ${symbol}:`, stock);
+
+            // Make API request
             const response = await this.queueRequest(async () => {
-                return axios.get(`${this.baseUrl}/quote`, {
+                console.log(`Making API request for ${symbol}`);
+                return await axios.get(`${this.baseUrl}/quote`, {
                     params: {
                         symbol: symbol.toUpperCase(),
                         token: this.finnhubKey
@@ -104,25 +98,29 @@ class StockPriceService {
                 });
             });
 
+            console.log(`API response for ${symbol}:`, response.data);
+
             if (!response.data || typeof response.data.c !== 'number' || response.data.c === 0) {
+                console.log(`Invalid API response for ${symbol}, using fallback`);
                 if (stock) {
-                    // Use last known price as fallback
-                    return {
+                    const fallbackData = {
                         symbol: stock.symbol,
-                        price: stock.currentPrice,
-                        change: stock.priceChange,
-                        changePercent: stock.changePercent,
-                        lastUpdated: stock.lastUpdated,
+                        price: stock.currentPrice || 0,
+                        change: stock.priceChange || 0,
+                        changePercent: stock.changePercent || 0,
+                        lastUpdated: stock.lastUpdated || new Date(),
                         isFallback: true
                     };
+                    console.log(`Using fallback data for ${symbol}:`, fallbackData);
+                    return fallbackData;
                 }
-                throw new Error('Invalid price data received');
+                throw new Error(`Invalid price data received for ${symbol}`);
             }
 
             const currentPrice = response.data.c;
             const previousPrice = response.data.pc || currentPrice;
-            const priceChange = currentPrice - previousPrice;
-            const changePercent = (priceChange / previousPrice) * 100;
+            const priceChange = response.data.d || (currentPrice - previousPrice);
+            const changePercent = response.data.dp || ((priceChange / previousPrice) * 100);
 
             const stockData = {
                 symbol: symbol.toUpperCase(),
@@ -133,65 +131,98 @@ class StockPriceService {
                 lastUpdated: new Date()
             };
 
+            console.log(`Processed stock data for ${symbol}:`, stockData);
+
             // Update caches
             this.cache.set(symbol, {
                 timestamp: Date.now(),
                 data: stockData
             });
-            this.globalQuoteCache.set(symbol, {
-                timestamp: Date.now(),
-                data: stockData
-            });
 
             // Update database
-            if (!stock) {
-                stock = new Stock({
-                    symbol: symbol.toUpperCase(),
-                    currentPrice,
-                    previousPrice,
-                    priceChange,
-                    changePercent,
-                    lastUpdated: new Date()
-                });
-            } else {
-                stock.currentPrice = currentPrice;
-                stock.previousPrice = previousPrice;
-                stock.priceChange = priceChange;
-                stock.changePercent = changePercent;
-                stock.lastUpdated = new Date();
+            try {
+                if (!stock) {
+                    const newStock = new Stock({
+                        symbol: symbol.toUpperCase(),
+                        currentPrice,
+                        previousPrice,
+                        priceChange,
+                        changePercent,
+                        lastUpdated: new Date()
+                    });
+                    await newStock.save();
+                    console.log(`Created new stock record for ${symbol}`);
+                } else {
+                    stock.currentPrice = currentPrice;
+                    stock.previousPrice = previousPrice;
+                    stock.priceChange = priceChange;
+                    stock.changePercent = changePercent;
+                    stock.lastUpdated = new Date();
+                    await stock.save();
+                    console.log(`Updated stock record for ${symbol}`);
+                }
+            } catch (dbError) {
+                console.error(`Error updating database for ${symbol}:`, dbError);
+                // Don't throw here, we still want to return the stock data
             }
-            await stock.save();
 
             return stockData;
         } catch (error) {
-            console.error('Error in getQuote:', error);
+            console.error(`Error fetching quote for ${symbol}:`, error);
+            // Try to use cached data as fallback
+            const cached = this.cache.get(symbol);
+            if (cached) {
+                console.log(`Using stale cache as fallback for ${symbol}:`, cached.data);
+                return cached.data;
+            }
             throw error;
         }
     }
 
     async getBatchQuotes(symbols) {
+        console.log('Getting batch quotes for symbols:', symbols);
+        
         if (!Array.isArray(symbols) || symbols.length === 0) {
+            console.log('No symbols provided for batch quotes');
             return {};
         }
 
         const quotes = {};
         const chunks = [];
-        for (let i = 0; i < symbols.length; i += 10) {
-            chunks.push(symbols.slice(i, i + 10));
+        for (let i = 0; i < symbols.length; i += 5) {  
+            chunks.push(symbols.slice(i, i + 5));
         }
 
+        console.log(`Processing ${chunks.length} chunks of symbols`);
+
         for (const chunk of chunks) {
+            console.log('Processing chunk:', chunk);
             await Promise.all(chunk.map(async (symbol) => {
                 try {
                     const quote = await this.getQuote(symbol);
                     quotes[symbol] = quote;
+                    console.log(`Successfully got quote for ${symbol}:`, quote);
                 } catch (error) {
                     console.error(`Error fetching quote for ${symbol}:`, error.message);
-                    quotes[symbol] = null;
+                    // Use a reasonable fallback value
+                    quotes[symbol] = {
+                        symbol,
+                        price: 0,
+                        change: 0,
+                        changePercent: 0,
+                        lastUpdated: new Date(),
+                        isFallback: true
+                    };
                 }
             }));
+            
+            // Add a small delay between chunks to avoid rate limiting
+            if (chunks.length > 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
         }
 
+        console.log('Final quotes object:', quotes);
         return quotes;
     }
 

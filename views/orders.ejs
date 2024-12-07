@@ -174,7 +174,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    openTradeModal('buy', symbol, data.price, companyName || symbol);
+                    openTradeModal('buy', symbol, data.price, data.companyName || companyName || symbol);
                 } else {
                     showAlert(data.message || 'Failed to fetch stock price', 'danger');
                 }
@@ -189,6 +189,7 @@
             document.getElementById('type').value = type;
             document.getElementById('symbol').value = symbol;
             document.getElementById('companyName').value = company;
+            document.getElementById('displayCompanyName').value = company;
             document.getElementById('currentPrice').value = parseFloat(price).toFixed(2);
             document.getElementById('quantity').value = '';
             document.getElementById('totalValue').value = '';
@@ -237,6 +238,7 @@
                 const formData = {
                     type: document.getElementById('type').value,
                     symbol: document.getElementById('symbol').value,
+                    companyName: document.getElementById('companyName').value,
                     quantity: parseInt(document.getElementById('quantity').value),
                     price: parseFloat(document.getElementById('currentPrice').value)
                 };

@@ -2,9 +2,13 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
     userId: {
-        type: String,
+        type: String,  // Auth0 ID
         required: true,
         index: true
+    },
+    userEmail: {
+        type: String,
+        required: true
     },
     symbol: {
         type: String,

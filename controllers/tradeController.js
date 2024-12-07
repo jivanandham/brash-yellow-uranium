@@ -1,7 +1,94 @@
+const mongoose = require('mongoose');
 const axios = require('axios');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const Transaction = require('../models/Transaction');
+const Holding = require('../models/Holding');
+const stockPriceService = require('../services/stockPriceService');
+
+// Function to update user holdings after a trade
+async function updateHoldings(userId, userEmail, symbol, companyName, type, quantity, price) {
+    try {
+        let holding = await Holding.findOne({ userId, symbol });
+        
+        if (!holding) {
+            // Create new holding if it doesn't exist
+            holding = new Holding({
+                userId,
+                userEmail,
+                symbol,
+                companyName,
+                quantity: 0,
+                averagePrice: 0,
+                totalInvestment: 0
+            });
+        } else {
+            // Update userEmail for existing holding to ensure it's always present
+            holding.userEmail = userEmail;
+        }
+
+        if (type === 'buy') {
+            // For buy orders:
+            // 1. Add new investment amount to total investment
+            // 2. Add new quantity to total quantity
+            // 3. Calculate new average price based on total investment and total quantity
+            const newInvestment = quantity * price;
+            const newQuantity = holding.quantity + quantity;
+            const totalInvestment = holding.totalInvestment + newInvestment;
+            
+            holding.quantity = newQuantity;
+            holding.totalInvestment = totalInvestment;
+            holding.averagePrice = totalInvestment / newQuantity;
+            
+            console.log('Updated holding after buy:', {
+                symbol,
+                oldQuantity: holding.quantity - quantity,
+                newQuantity: holding.quantity,
+                oldAvgPrice: holding.averagePrice,
+                newAvgPrice: totalInvestment / newQuantity,
+                totalInvestment
+            });
+        } else if (type === 'sell') {
+            // For sell orders:
+            // 1. Reduce quantity
+            // 2. Reduce total investment proportionally
+            // 3. Keep the same average price
+            const newQuantity = holding.quantity - quantity;
+            if (newQuantity < 0) {
+                throw new Error('Insufficient shares to sell');
+            }
+            
+            // Calculate the portion of investment being sold
+            const soldInvestment = (quantity / holding.quantity) * holding.totalInvestment;
+            const remainingInvestment = holding.totalInvestment - soldInvestment;
+            
+            holding.quantity = newQuantity;
+            holding.totalInvestment = remainingInvestment;
+            // Keep the same average price for remaining shares
+            
+            console.log('Updated holding after sell:', {
+                symbol,
+                oldQuantity: holding.quantity + quantity,
+                newQuantity: holding.quantity,
+                avgPrice: holding.averagePrice,
+                remainingInvestment
+            });
+        }
+
+        // If quantity becomes 0, remove the holding
+        if (holding.quantity === 0) {
+            await Holding.deleteOne({ userId, symbol });
+            console.log(`Removed holding for ${symbol} as quantity is 0`);
+        } else {
+            holding.lastUpdated = new Date();
+            await holding.save();
+            console.log(`Saved holding for ${symbol}:`, holding.toObject());
+        }
+    } catch (error) {
+        console.error('Error updating holdings:', error);
+        throw error;
+    }
+}
 
 // Get real-time stock price
 exports.getStockPrice = async (req, res) => {
@@ -15,20 +102,16 @@ exports.getStockPrice = async (req, res) => {
             });
         }
 
-        const response = await axios.get(`https://www.alphavantage.co/query`, {
-            params: {
-                function: 'GLOBAL_QUOTE',
-                symbol: symbol,
-                apikey: process.env.TRADING_API_KEY
-            }
-        });
-
-        const data = response.data;
-        if (data['Global Quote'] && data['Global Quote']['05. price']) {
-            const price = parseFloat(data['Global Quote']['05. price']);
+        const [quote, company] = await Promise.all([
+            stockPriceService.getQuote(symbol),
+            stockPriceService.getCompanyProfile(symbol)
+        ]);
+        
+        if (quote && quote.price) {
             res.json({ 
                 success: true,
-                price 
+                price: quote.price,
+                companyName: company.name
             });
         } else {
             res.status(404).json({ 
@@ -50,11 +133,11 @@ exports.executeTrade = async (req, res) => {
     try {
         console.log('Received trade request:', req.body);
         
-        const { type, symbol, quantity, price } = req.body;
+        const { type, symbol, companyName, quantity, price } = req.body;
         const userEmail = req.oidc.user.email;
 
         // Validate input
-        if (!type || !symbol || !quantity || !price) {
+        if (!type || !symbol || !companyName || !quantity || !price) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing required fields'
@@ -102,26 +185,13 @@ exports.executeTrade = async (req, res) => {
             console.log('Buy trade - Updated wallet balance:', user.walletBalance);
         } else if (type === 'sell') {
             // Get current holdings
-            const orders = await Order.find({ 
-                userId: userEmail,
-                symbol: symbol,
-                status: 'completed'
+            const holding = await Holding.findOne({ 
+                userId: req.oidc.user.sub,
+                symbol: symbol
             });
-
-            // Calculate total quantity owned
-            let totalOwned = 0;
-            orders.forEach(order => {
-                if (order.type === 'buy') {
-                    totalOwned += order.quantity;
-                } else {
-                    totalOwned -= order.quantity;
-                }
-            });
-
-            console.log('Sell trade - Current holdings:', { symbol, totalOwned, quantityToSell: quantity });
 
             // Check if user has enough shares to sell
-            if (totalOwned < quantity) {
+            if (!holding || holding.quantity < quantity) {
                 return res.status(400).json({
                     success: false,
                     message: 'Insufficient shares'
@@ -141,8 +211,10 @@ exports.executeTrade = async (req, res) => {
 
         // Create order
         const order = new Order({
-            userId: userEmail,
+            userId: req.oidc.user.sub,  
+            userEmail: userEmail,  
             symbol,
+            companyName,
             type,
             quantity,
             price,
@@ -153,13 +225,17 @@ exports.executeTrade = async (req, res) => {
 
         // Create transaction
         const transaction = new Transaction({
-            userEmail,
-            type: 'trade',
+            userId: req.oidc.user.sub,  
+            userEmail: userEmail,
+            type: 'stock_' + type,
             amount: type === 'buy' ? -totalValue : totalValue,
             balance: user.walletBalance,
-            description: `${type === 'buy' ? 'Bought' : 'Sold'} ${quantity} shares of ${symbol}`,
+            description: `${type === 'buy' ? 'Stock Purchase' : 'Stock Sale'}: ${quantity} shares of ${companyName} (${symbol}) at $${price.toFixed(2)} per share`,
             stockSymbol: symbol,
-            tradeType: type,
+            quantity,
+            price,
+            total: totalValue,
+            status: 'completed',
             date: new Date()
         });
 
@@ -168,24 +244,49 @@ exports.executeTrade = async (req, res) => {
             transaction: transaction.toObject()
         });
 
-        // Save everything
-        await Promise.all([
-            user.save(),
-            order.save(),
-            transaction.save()
-        ]);
+        try {
+            // Save everything and update holdings
+            const [savedUser, savedOrder, savedTransaction] = await Promise.all([
+                user.save(),
+                order.save(),
+                transaction.save()
+            ]);
 
-        res.json({
-            success: true,
-            message: `Successfully ${type === 'buy' ? 'bought' : 'sold'} ${quantity} shares of ${symbol}`,
-            newBalance: user.walletBalance,
-            order: {
-                symbol,
-                quantity,
-                price,
-                total: totalValue
-            }
-        });
+            // Update holdings after saving order and transaction
+            await updateHoldings(req.oidc.user.sub, userEmail, symbol, companyName, type, quantity, price);
+
+            console.log('Successfully saved all trade records and updated holdings');
+
+            res.json({
+                success: true,
+                message: `Successfully ${type === 'buy' ? 'bought' : 'sold'} ${quantity} shares of ${symbol}`,
+                newBalance: savedUser.walletBalance,
+                order: {
+                    id: savedOrder._id,
+                    symbol,
+                    companyName,
+                    quantity,
+                    price,
+                    total: totalValue,
+                    type,
+                    date: savedOrder.orderDate
+                },
+                transaction: {
+                    id: savedTransaction._id,
+                    type: savedTransaction.type,
+                    amount: savedTransaction.amount,
+                    balance: savedTransaction.balance,
+                    description: savedTransaction.description,
+                    date: savedTransaction.date
+                }
+            });
+        } catch (error) {
+            console.error('Error executing trade:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Error executing trade'
+            });
+        }
     } catch (error) {
         console.error('Error executing trade:', error);
         res.status(500).json({

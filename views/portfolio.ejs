@@ -187,10 +187,10 @@
                                         </td>
                                         <td class="text-end">
                                             <div class="btn-group stock-action">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="openTradeModal('buy', '<%= holding.symbol %>', <%= holding.currentPrice %>)">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="openTradeModal('buy', '<%= holding.symbol %>', <%= holding.currentPrice %>, '<%= holding.companyName.replace(/'/g, "\\'") %>')">
                                                     Buy
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="openTradeModal('sell', '<%= holding.symbol %>', <%= holding.currentPrice %>)">
+                                                <button class="btn btn-sm btn-outline-danger" onclick="openTradeModal('sell', '<%= holding.symbol %>', <%= holding.currentPrice %>, '<%= holding.companyName.replace(/'/g, "\\'") %>')">
                                                     Sell
                                                 </button>
                                                 <button class="btn btn-sm btn-outline-secondary" onclick="addToWatchlist('<%= holding.symbol %>')">
@@ -219,11 +219,111 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/js/trade.js"></script>
     <script>
+        let currentWalletBalance = <%= user.walletBalance %>;
+        const tradeModal = new bootstrap.Modal(document.getElementById('tradeModal'));
+        const tradeSuccessModal = new bootstrap.Modal(document.getElementById('tradeSuccessModal'));
+
         function refreshPrices() {
-            // TODO: Implement price refresh functionality
             location.reload();
+        }
+
+        function openTradeModal(type, symbol, currentPrice, companyName) {
+            // Reset form
+            document.getElementById('tradeForm').reset();
+            document.getElementById('tradeAlert').classList.add('d-none');
+            
+            // Set form values
+            document.getElementById('type').value = type;
+            document.getElementById('symbol').value = symbol;
+            document.getElementById('companyName').value = companyName;
+            document.getElementById('displayCompanyName').value = companyName;
+            document.getElementById('currentPrice').value = currentPrice.toFixed(2);
+            document.getElementById('availableBalance').value = currentWalletBalance.toFixed(2);
+            
+            // Update modal title and button
+            document.getElementById('tradeModalLabel').textContent = type === 'buy' ? 'Buy Stock' : 'Sell Stock';
+            const executeBtn = document.getElementById('executeTradeBtn');
+            executeBtn.textContent = type === 'buy' ? 'Buy Stock' : 'Sell Stock';
+            executeBtn.className = `btn ${type === 'buy' ? 'btn-success' : 'btn-danger'}`;
+            
+            // Show modal
+            tradeModal.show();
+            
+            // Set up quantity change handler
+            document.getElementById('quantity').addEventListener('input', updateTotalValue);
+        }
+
+        function updateTotalValue() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const totalValue = quantity * currentPrice;
+            document.getElementById('totalValue').value = totalValue.toFixed(2);
+        }
+
+        async function executeTrade(event) {
+            event.preventDefault();
+            
+            const executeBtn = document.getElementById('executeTradeBtn');
+            executeBtn.disabled = true;
+            
+            try {
+                const formData = {
+                    type: document.getElementById('type').value,
+                    symbol: document.getElementById('symbol').value,
+                    quantity: parseInt(document.getElementById('quantity').value),
+                    price: parseFloat(document.getElementById('currentPrice').value),
+                    companyName: document.getElementById('companyName').value
+                };
+
+                const response = await fetch('/trade/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Update wallet balance
+                    currentWalletBalance = data.newBalance;
+                    document.querySelector('.wallet-balance').textContent = `$${data.newBalance.toFixed(2)}`;
+                    
+                    // Show success message
+                    document.getElementById('successMessage').textContent = data.message;
+                    document.getElementById('successDetails').innerHTML = `
+                        <p>Order Details:</p>
+                        <ul>
+                            <li>Type: ${data.order.type}</li>
+                            <li>Symbol: ${data.order.symbol}</li>
+                            <li>Quantity: ${data.order.quantity}</li>
+                            <li>Price: $${data.order.price.toFixed(2)}</li>
+                            <li>Total: $${data.order.total.toFixed(2)}</li>
+                            <li>Date: ${new Date(data.order.date).toLocaleString()}</li>
+                        </ul>
+                    `;
+                    
+                    // Hide trade modal and show success modal
+                    tradeModal.hide();
+                    tradeSuccessModal.show();
+                    
+                    // Reload page after 2 seconds to show updated holdings
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'Failed to execute trade');
+                }
+            } catch (error) {
+                const alertDiv = document.getElementById('tradeAlert');
+                alertDiv.textContent = error.message;
+                alertDiv.classList.remove('d-none', 'alert-success');
+                alertDiv.classList.add('alert-danger');
+            } finally {
+                executeBtn.disabled = false;
+            }
         }
 
         function addToWatchlist(symbol) {

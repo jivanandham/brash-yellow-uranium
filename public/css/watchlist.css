@@ -3,12 +3,17 @@ body {
     min-block-size: 100vh;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .watchlist-container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .page-header {
@@ -20,6 +25,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: all 0.3s ease;
 }
 
 .header-title {
@@ -52,6 +58,9 @@ body {
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .filter-bar {
@@ -82,6 +91,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .profile-action-btn:hover {
@@ -101,6 +112,11 @@ body {
 .watchlist-table {
     width: 100%;
     margin-bottom: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .watchlist-table th {
@@ -108,16 +124,24 @@ body {
     color: white;
     padding: 1rem;
     font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .watchlist-table td {
     padding: 1rem;
     border-bottom: 1px solid #eee;
     vertical-align: middle;
+    transition: background-color 0.2s ease;
 }
 
 .watchlist-table tr:last-child td {
     border-bottom: none;
+}
+
+.watchlist-table tr {
+    transition: background-color 0.2s ease;
 }
 
 .watchlist-table tr:hover {
@@ -141,12 +165,120 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.price-up {
+.price-change {
+    transition: color 0.3s ease;
+    display: inline-block;
+}
+
+.price-change.positive {
     color: #28a745;
 }
 
-.price-down {
+.price-change.negative {
     color: #dc3545;
+}
+
+/* Flash animations for price updates */
+@keyframes flashGreen {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(40, 167, 69, 0.1); }
+    100% { background-color: transparent; }
+}
+
+@keyframes flashRed {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(220, 53, 69, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.flash-green {
+    animation: flashGreen 1s ease-out;
+}
+
+.flash-red {
+    animation: flashRed 1s ease-out;
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification.success {
+    border-left: 4px solid #28a745;
+}
+
+.notification.error {
+    border-left: 4px solid #dc3545;
+}
+
+.notification.warning {
+    border-left: 4px solid #ffc107;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notification i {
+    font-size: 1.25rem;
+}
+
+.notification.success i {
+    color: #28a745;
+}
+
+.notification.error i {
+    color: #dc3545;
+}
+
+.notification.warning i {
+    color: #ffc107;
+}
+
+/* Search results styles */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.search-result-item {
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.search-result-item:not(:last-child) {
+    border-bottom: 1px solid #eee;
 }
 
 @media (max-width: 768px) {
@@ -173,5 +305,12 @@ body {
     .watchlist-table {
         display: block;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .notification {
+        left: 20px;
+        right: 20px;
+        text-align: center;
     }
 }

@@ -111,278 +111,288 @@
     <%- include('partials/navbar') %>
     <%- include('partials/user-navbar') %>
 
-    <div class="watchlist-container">
-        <!-- Header Section -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Watchlist</h2>
-            <div class="btn-group">
-                <button class="btn btn-outline-primary" onclick="refreshWatchlist()">
-                    <i class="fas fa-sync-alt refresh-icon me-2"></i> Refresh
-                </button>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
-                    <i class="fas fa-plus me-2"></i> Add Stock
-                </button>
-            </div>
-        </div>
-
-        <!-- Watchlist Table -->
-        <div class="table-responsive">
-            <table class="table watchlist-table">
-                <thead>
-                    <tr>
-                        <th style="width: 25%">Stock</th>
-                        <th style="width: 20%">Sector</th>
-                        <th style="width: 15%" class="text-end">Price</th>
-                        <th style="width: 15%" class="text-end">Change</th>
-                        <th style="width: 15%" class="text-end">Last Updated</th>
-                        <th style="width: 10%" class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (watchlist && watchlist.length > 0) { %>
-                        <% watchlist.forEach(stock => { %>
-                            <tr id="stock-<%= stock.symbol %>">
-                                <td>
-                                    <div class="stock-symbol"><%= stock.symbol %></div>
-                                    <div class="company-name text-muted"><%= stock.name %></div>
-                                </td>
-                                <td><%= stock.sector %></td>
-                                <td class="text-end price-value">$<%= stock.lastPrice.toFixed(2) %></td>
-                                <td class="text-end">
-                                    <span class="price-change <%= stock.priceChange >= 0 ? 'positive' : 'negative' %>">
-                                        <%= stock.priceChange >= 0 ? '+' : '' %><%= stock.priceChange.toFixed(2) %>%
-                                    </span>
-                                </td>
-                                <td class="text-end last-updated">
-                                    <%= new Date(stock.lastUpdated).toLocaleString() %>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="openTradeModal('buy', '<%= stock.symbol %>', <%= stock.lastPrice %>)">
-                                            Buy
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromWatchlist('<%= stock.symbol %>')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    <% } else { %>
-                        <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <div class="text-muted">
-                                    <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
-                                    <p>Your watchlist is empty. Start by adding some stocks!</p>
-                                </div>
-                            </td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Add Stock Modal -->
-    <div class="modal fade" id="addStockModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Stock to Watchlist</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3 position-relative">
-                        <label for="stockSearch" class="form-label">Search Stock</label>
-                        <input type="text" class="form-control" id="stockSearch" placeholder="Enter stock symbol or company name">
-                        <div id="searchResults" class="search-results d-none"></div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>My Watchlist</h2>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <strong>Wallet Balance: </strong>
+                            <span class="wallet-balance">$<%= user.walletBalance.toFixed(2) %></span>
+                        </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                            <i class="fas fa-plus"></i> Add Stock
+                        </button>
                     </div>
                 </div>
+
+                <% if (watchlist.length === 0) { %>
+                    <div class="alert alert-info">
+                        Your watchlist is empty. Add some stocks to get started!
+                    </div>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Company Name</th>
+                                    <th>Sector</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% watchlist.forEach(stock => { %>
+                                    <tr>
+                                        <td><%= stock.symbol %></td>
+                                        <td><%= stock.name %></td>
+                                        <td><%= stock.sector || 'N/A' %></td>
+                                        <td class="stock-price" data-symbol="<%= stock.symbol %>">$<%= stock.lastPrice.toFixed(2) %></td>
+                                        <td class="stock-change" data-symbol="<%= stock.symbol %>">
+                                            <% if (stock.priceChange >= 0) { %>
+                                                <span class="text-success">+<%= stock.priceChange.toFixed(2) %>%</span>
+                                            <% } else { %>
+                                                <span class="text-danger"><%= stock.priceChange.toFixed(2) %>%</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-success btn-sm me-2" onclick="openTradeModal('buy', '<%= stock.symbol %>', '<%= stock.lastPrice %>', `<%= stock.name.replace(/'/g, "\\'") %>`)">
+                                                <i class="fas fa-shopping-cart"></i> Buy
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" onclick="removeFromWatchlist('<%= stock.symbol %>')">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>
 
-    <!-- Trade Modal -->
     <%- include('partials/trade-modal') %>
+    <%- include('partials/add-stock-modal') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        let searchTimeout;
-        const searchInput = document.getElementById('stockSearch');
-        const searchResults = document.getElementById('searchResults');
+        let currentWalletBalance = <%= user.walletBalance %>;
 
-        // Real-time stock search
-        searchInput.addEventListener('input', function(e) {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
+        // Update wallet balance
+        function updateWalletBalance(balance) {
+            currentWalletBalance = balance;
+            document.getElementById('availableBalance').value = balance.toFixed(2);
             
-            if (query.length < 2) {
-                searchResults.classList.add('d-none');
-                return;
+            // Update all wallet balance displays on the page
+            document.querySelectorAll('.wallet-balance').forEach(el => {
+                el.textContent = `$${balance.toFixed(2)}`;
+            });
+        }
+
+        // Show trade alert
+        function showTradeAlert(message, type) {
+            const alertEl = document.getElementById('tradeAlert');
+            alertEl.className = `alert alert-${type}`;
+            alertEl.textContent = message;
+            alertEl.classList.remove('d-none');
+        }
+
+        // Initialize trade modal
+        function openTradeModal(type, symbol, price, company) {
+            // Reset alert
+            document.getElementById('tradeAlert').classList.add('d-none');
+            
+            // Set form values
+            document.getElementById('type').value = type;
+            document.getElementById('symbol').value = symbol;
+            document.getElementById('currentPrice').value = parseFloat(price).toFixed(2);
+            document.getElementById('companyName').value = company;
+            document.getElementById('displayCompanyName').value = company;
+            document.getElementById('quantity').value = '';
+            document.getElementById('totalValue').value = '';
+            
+            // Update wallet balance display
+            document.getElementById('availableBalance').value = currentWalletBalance.toFixed(2);
+            
+            // Update modal UI
+            const modalTitle = document.getElementById('tradeModalLabel');
+            const executeBtn = document.getElementById('executeTradeBtn');
+            
+            if (type === 'buy') {
+                modalTitle.textContent = 'Buy Stock';
+                executeBtn.textContent = 'Buy';
+                executeBtn.className = 'btn btn-success';
+            } else {
+                modalTitle.textContent = 'Sell Stock';
+                executeBtn.textContent = 'Sell';
+                executeBtn.className = 'btn btn-danger';
             }
+            
+            const tradeModal = new bootstrap.Modal(document.getElementById('tradeModal'));
+            tradeModal.show();
+        }
 
-            searchTimeout = setTimeout(async () => {
-                try {
-                    const response = await fetch(`/stock/search?q=${encodeURIComponent(query)}`);
-                    const data = await response.json();
-
-                    if (data.success && data.results.length > 0) {
-                        searchResults.innerHTML = data.results.map(stock => `
-                            <div class="search-result-item" onclick="addToWatchlist('${stock.symbol}', '${stock.name}', '${stock.sector}')">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <strong>${stock.symbol}</strong>
-                                        <div class="small text-muted">${stock.name}</div>
-                                    </div>
-                                    <div class="text-end">
-                                        <div>$${stock.price.toFixed(2)}</div>
-                                        <div class="small ${stock.change >= 0 ? 'text-success' : 'text-danger'}">
-                                            ${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('');
-                        searchResults.classList.remove('d-none');
-                    } else {
-                        searchResults.innerHTML = '<div class="p-3 text-muted">No results found</div>';
-                        searchResults.classList.remove('d-none');
-                    }
-                } catch (error) {
-                    console.error('Search error:', error);
-                    showAlert('Failed to search stocks', 'danger');
-                }
-            }, 300);
+        // Calculate total value when quantity changes
+        document.getElementById('quantity').addEventListener('input', function(e) {
+            const quantity = parseInt(e.target.value) || 0;
+            const price = parseFloat(document.getElementById('currentPrice').value);
+            const totalValue = (quantity * price).toFixed(2);
+            document.getElementById('totalValue').value = totalValue;
+            
+            const submitBtn = document.getElementById('executeTradeBtn');
+            const type = document.getElementById('type').value;
+            
+            if (quantity <= 0) {
+                e.target.classList.add('is-invalid');
+                submitBtn.disabled = true;
+                showTradeAlert('Please enter a valid quantity', 'danger');
+            } else if (type === 'buy' && quantity * price > currentWalletBalance) {
+                e.target.classList.add('is-invalid');
+                submitBtn.disabled = true;
+                showTradeAlert('Insufficient funds for this trade', 'danger');
+            } else {
+                e.target.classList.remove('is-invalid');
+                submitBtn.disabled = false;
+                document.getElementById('tradeAlert').classList.add('d-none');
+            }
         });
 
-        // Add stock to watchlist
-        async function addToWatchlist(symbol, name, sector) {
+        // Execute trade
+        async function executeTrade(event) {
+            event.preventDefault();
+            
+            const executeBtn = document.getElementById('executeTradeBtn');
+            executeBtn.disabled = true;
+            
             try {
-                const response = await fetch('/watchlist/add', {
+                const formData = {
+                    type: document.getElementById('type').value,
+                    symbol: document.getElementById('symbol').value,
+                    companyName: document.getElementById('companyName').value,
+                    quantity: parseInt(document.getElementById('quantity').value),
+                    price: parseFloat(document.getElementById('currentPrice').value)
+                };
+                
+                console.log('Executing trade:', formData);
+                
+                const response = await fetch('/trade/execute', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ symbol, name, sector })
+                    body: JSON.stringify(formData)
                 });
-
-                const data = await response.json();
                 
-                if (data.success) {
-                    showAlert('Stock added to watchlist', 'success');
-                    location.reload();
+                const result = await response.json();
+                console.log('Trade response:', result);
+                
+                if (response.ok) {
+                    // Update wallet balance
+                    updateWalletBalance(result.newBalance);
+                    
+                    // Show success modal
+                    document.getElementById('successMessage').textContent = result.message;
+                    document.getElementById('successDetails').textContent = 
+                        `Total Value: $${(formData.quantity * formData.price).toFixed(2)} | New Balance: $${result.newBalance.toFixed(2)}`;
+                    
+                    const tradeModal = bootstrap.Modal.getInstance(document.getElementById('tradeModal'));
+                    const successModal = new bootstrap.Modal(document.getElementById('tradeSuccessModal'));
+                    tradeModal.hide();
+                    successModal.show();
+                    
+                    // Refresh the page after a delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
                 } else {
-                    showAlert(data.message || 'Failed to add stock', 'danger');
+                    showTradeAlert(result.message || 'Failed to execute trade', 'danger');
+                    executeBtn.disabled = false;
                 }
             } catch (error) {
-                console.error('Add to watchlist error:', error);
-                showAlert('Failed to add stock to watchlist', 'danger');
+                console.error('Error executing trade:', error);
+                showTradeAlert('An error occurred while executing the trade', 'danger');
+                executeBtn.disabled = false;
             }
-
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addStockModal'));
-            modal.hide();
         }
 
         // Remove stock from watchlist
         async function removeFromWatchlist(symbol) {
-            if (!confirm(`Remove ${symbol} from watchlist?`)) {
-                return;
-            }
-
             try {
-                const response = await fetch('/watchlist/remove', {
-                    method: 'POST',
+                const response = await fetch(`/api/watchlist/remove/${symbol}`, {
+                    method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ symbol })
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    const row = document.getElementById(`stock-${symbol}`);
-                    row.remove();
-                    showAlert('Stock removed from watchlist', 'success');
-                    
-                    // If no stocks left, show empty state
-                    if (document.querySelectorAll('.watchlist-table tbody tr').length === 0) {
-                        document.querySelector('.watchlist-table tbody').innerHTML = `
-                            <tr>
-                                <td colspan="6" class="text-center py-4">
-                                    <div class="text-muted">
-                                        <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
-                                        <p>Your watchlist is empty. Start by adding some stocks!</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
                     }
+                });
+                
+                if (response.ok) {
+                    showAlert('Stock removed from watchlist', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 } else {
+                    const data = await response.json();
                     showAlert(data.message || 'Failed to remove stock', 'danger');
                 }
             } catch (error) {
-                console.error('Remove from watchlist error:', error);
-                showAlert('Failed to remove stock from watchlist', 'danger');
+                console.error('Error removing stock:', error);
+                showAlert('An error occurred while removing the stock', 'danger');
             }
         }
-
-        // Refresh watchlist prices
-        async function refreshWatchlist() {
-            const refreshIcon = document.querySelector('.refresh-icon');
-            refreshIcon.classList.add('spinning');
-
-            try {
-                const response = await fetch('/watchlist/refresh');
-                const data = await response.json();
-                
-                if (data.success) {
-                    data.watchlist.forEach(stock => {
-                        const row = document.getElementById(`stock-${stock.symbol}`);
-                        if (row) {
-                            row.querySelector('.price-value').textContent = `$${stock.lastPrice.toFixed(2)}`;
-                            const changeElement = row.querySelector('.price-change');
-                            changeElement.textContent = `${stock.priceChange >= 0 ? '+' : ''}${stock.priceChange.toFixed(2)}%`;
-                            changeElement.className = `price-change ${stock.priceChange >= 0 ? 'positive' : 'negative'}`;
-                            row.querySelector('.last-updated').textContent = new Date(stock.lastUpdated).toLocaleString();
-                        }
-                    });
-                    showAlert('Prices updated successfully', 'success');
-                } else {
-                    showAlert(data.message || 'Failed to refresh prices', 'danger');
-                }
-            } catch (error) {
-                console.error('Refresh error:', error);
-                showAlert('Failed to refresh prices', 'danger');
-            }
-
-            refreshIcon.classList.remove('spinning');
-        }
-
-        // Auto-refresh prices every minute
-        setInterval(refreshWatchlist, 60000);
 
         // Show alert message
-        function showAlert(message, type) {
+        function showAlert(message, type, duration = 3000) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
             alertDiv.style.zIndex = '9999';
             alertDiv.innerHTML = `
                 ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
             document.body.appendChild(alertDiv);
-            setTimeout(() => alertDiv.remove(), 3000);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, duration);
         }
 
-        // Close search results when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.classList.add('d-none');
+        // Update stock prices periodically
+        function updateStockPrices() {
+            const symbols = Array.from(document.querySelectorAll('[data-symbol]')).map(el => el.dataset.symbol);
+            
+            if (symbols.length > 0) {
+                fetch(`/api/stock/prices?symbols=${symbols.join(',')}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        Object.entries(data).forEach(([symbol, stockData]) => {
+                            const priceEl = document.querySelector(`.stock-price[data-symbol="${symbol}"]`);
+                            const changeEl = document.querySelector(`.stock-change[data-symbol="${symbol}"]`);
+                            
+                            if (priceEl) {
+                                priceEl.textContent = `$${stockData.price.toFixed(2)}`;
+                            }
+                            
+                            if (changeEl) {
+                                const changeText = stockData.change >= 0 ? 
+                                    `+${stockData.change.toFixed(2)}%` : 
+                                    `${stockData.change.toFixed(2)}%`;
+                                const changeClass = stockData.change >= 0 ? 'text-success' : 'text-danger';
+                                changeEl.innerHTML = `<span class="${changeClass}">${changeText}</span>`;
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error updating stock prices:', error));
             }
-        });
+        }
+
+        // Update prices every 30 seconds
+        setInterval(updateStockPrices, 30000);
     </script>
 </body>
 </html>

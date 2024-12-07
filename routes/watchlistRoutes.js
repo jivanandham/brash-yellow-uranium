@@ -81,7 +81,7 @@ router.get('/', async (req, res) => {
 router.post('/add', async (req, res) => {
     try {
         const userId = req.oidc.user.sub;
-        const { symbol } = req.body;
+        const { symbol, name: providedName, sector: providedSector } = req.body;
 
         if (!symbol) {
             return res.status(400).json({ 
@@ -90,16 +90,22 @@ router.post('/add', async (req, res) => {
             });
         }
 
-        // Get company info from stock service
-        const companyInfo = await stockPriceService.getCompanyProfile(symbol);
-        const quote = await stockPriceService.getQuote(symbol);
+        // Get company info and quote from stock service
+        const [companyInfo, quote] = await Promise.all([
+            stockPriceService.getCompanyProfile(symbol),
+            stockPriceService.getQuote(symbol)
+        ]);
 
-        if (!companyInfo || !companyInfo.name) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid stock symbol' 
-            });
-        }
+        // Use provided data or fallback to API data
+        const stockData = {
+            symbol,
+            name: providedName || (companyInfo && companyInfo.name) || symbol,
+            sector: providedSector || (companyInfo && companyInfo.sector) || 'N/A',
+            lastPrice: quote ? quote.price : 0,
+            priceChange: quote ? quote.change : 0,
+            addedAt: new Date(),
+            lastUpdated: new Date()
+        };
 
         let userWatchlist = await Watchlist.findOne({ userId });
         
@@ -108,21 +114,22 @@ router.post('/add', async (req, res) => {
         }
 
         // Check if stock already exists
-        if (!userWatchlist.hasStock(symbol)) {
-            userWatchlist.addStock({
-                symbol,
-                name: companyInfo.name,
-                sector: companyInfo.sector || 'N/A',
-                lastPrice: quote.price || 0,
-                priceChange: quote.change || 0,
-                addedAt: new Date(),
-                lastUpdated: new Date()
+        if (userWatchlist.hasStock(symbol)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Stock already in watchlist' 
             });
-            await userWatchlist.save();
-            res.json({ success: true, message: 'Stock added to watchlist' });
-        } else {
-            res.json({ success: false, message: 'Stock already in watchlist' });
         }
+
+        // Add stock to watchlist
+        userWatchlist.addStock(stockData);
+        await userWatchlist.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Stock added to watchlist',
+            stock: stockData
+        });
     } catch (error) {
         console.error('Error adding stock to watchlist:', error);
         res.status(500).json({ 

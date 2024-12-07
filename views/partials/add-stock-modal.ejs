@@ -1,0 +1,53 @@
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStockModalLabel">Add Stock to Watchlist</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStockForm">
+                    <div class="mb-3">
+                        <label for="stockSymbol" class="form-label">Stock Symbol</label>
+                        <input type="text" class="form-control" id="stockSymbol" name="symbol" required>
+                        <div class="form-text">Enter the stock symbol (e.g., AAPL for Apple)</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addStockButton">Add to Watchlist</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('addStockButton').addEventListener('click', async function() {
+    const symbol = document.getElementById('stockSymbol').value.toUpperCase();
+    if (!symbol) {
+        alert('Please enter a stock symbol');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/watchlist/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ symbol })
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error);
+        }
+
+        // Refresh the page to show the updated watchlist
+        window.location.reload();
+    } catch (error) {
+        alert('Error adding stock: ' + error.message);
+    }
+});</script>

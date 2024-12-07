@@ -29,6 +29,8 @@ const blogRoutes = require('./routes/blogRoutes');
 const tradeRoutes = require('./routes/trade');
 const stockRoutes = require('./routes/stockRoutes');
 const errorHandler = require('./middlewares/errorHandler');
+const watchlistApiRoutes = require('./routes/api/watchlist');
+const ordersApiRoutes = require('./routes/api/orders');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -121,6 +123,8 @@ app.use('/watchlist', requiresAuth(), watchlistRoutes);
 app.use('/orders', requiresAuth(), orderRoutes);
 app.use('/notifications', requiresAuth(), notificationRoutes);
 app.use('/api', apiRoutes);
+app.use('/api/watchlist', watchlistApiRoutes);
+app.use('/api/orders', requiresAuth(), ordersApiRoutes);
 app.use('/portfolio', requiresAuth(), portfolioRoutes);
 app.use('/blog', blogRoutes);
 app.use('/trade', requiresAuth(), tradeRoutes);

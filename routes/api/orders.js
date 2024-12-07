@@ -150,15 +150,15 @@ router.post('/', async (req, res) => {
 // Get user's orders
 router.get('/', async (req, res) => {
     try {
-        const user = await User.findOne({ auth0Id: req.oidc.user.sub });
-        if (!user) {
+        const userEmail = req.oidc.user.email;
+        if (!userEmail) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const orders = await Order.find({ userId: user._id })
-            .sort({ createdAt: -1 });
+        const orders = await Order.find({ userId: userEmail })
+            .sort({ orderDate: -1 });
 
-        res.json(orders);
+        res.json({ orders });
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ message: 'Internal server error' });
