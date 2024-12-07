@@ -81,6 +81,7 @@ app.use(async (req, res, next) => {
       if (!user) {
         // Create new user if doesn't exist
         user = await User.create({
+          _id: req.oidc.user.sub, // Set _id as Auth0 ID
           name: req.oidc.user.name,
           email: req.oidc.user.email,
           picture: req.oidc.user.picture,

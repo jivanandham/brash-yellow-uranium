@@ -159,7 +159,13 @@ exports.executeTrade = async (req, res) => {
         }
 
         // Get or create user
-        let user = await User.findOne({ email: userEmail });
+        let user = await User.findOne({ 
+            $or: [
+                { _id: userId },
+                { email: userEmail }
+            ]
+        });
+
         if (!user) {
             // Create new user if not exists
             user = new User({
@@ -169,8 +175,29 @@ exports.executeTrade = async (req, res) => {
                 picture: req.oidc.user.picture,
                 role: 'user'
             });
-            await user.save();
-            console.log('Created new user:', user);
+            try {
+                await user.save();
+                console.log('Created new user:', user);
+            } catch (error) {
+                console.error('Error creating user:', error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Error creating user account'
+                });
+            }
+        } else if (user._id !== userId) {
+            // If user exists but has a different _id, update it
+            user._id = userId;
+            try {
+                await user.save();
+                console.log('Updated user ID:', user);
+            } catch (error) {
+                console.error('Error updating user ID:', error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Error updating user account'
+                });
+            }
         }
 
         const totalValue = quantity * price;

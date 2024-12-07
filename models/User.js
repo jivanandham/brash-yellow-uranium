@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  auth0Id: {
+  _id: { 
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   name: { 
     type: String, 
@@ -50,5 +49,8 @@ const UserSchema = new mongoose.Schema({
 }, {
   timestamps: true // This adds createdAt and updatedAt fields automatically
 });
+
+// Create indexes
+UserSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', UserSchema);
