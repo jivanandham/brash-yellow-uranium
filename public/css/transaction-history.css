@@ -75,11 +75,13 @@
     color: white;
 }
 
-.status-badge.deposit {
-    background: linear-gradient(45deg, #28a745, #218838);
+.status-badge.deposit,
+.status-badge.stock_buy {
+    background: linear-gradient(45deg, #007bff, #0056b3);
 }
 
-.status-badge.withdraw {
+.status-badge.withdraw,
+.status-badge.stock_sell {
     background: linear-gradient(45deg, #dc3545, #c82333);
 }
 

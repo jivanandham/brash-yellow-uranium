@@ -56,22 +56,32 @@
                   </td>
                   <td data-label="Type">
                     <span class="status-badge <%= txn.type %>">
-                      <% if (txn.type === 'trade') { %>
-                        <i class="fas <%= txn.tradeType === 'buy' ? 'fa-shopping-cart' : 'fa-dollar-sign' %> me-1"></i>
-                        <%= txn.tradeType === 'buy' ? 'Buy' : 'Sell' %>
-                      <% } else { %>
-                        <i class="fas <%= txn.type === 'deposit' ? 'fa-arrow-down' : 'fa-arrow-up' %> me-1"></i>
-                        <%= txn.type.charAt(0).toUpperCase() + txn.type.slice(1) %>
+                      <% if (txn.type === 'stock_buy') { %>
+                        <i class="fas fa-shopping-cart me-1"></i>
+                        Buy
+                      <% } else if (txn.type === 'stock_sell') { %>
+                        <i class="fas fa-dollar-sign me-1"></i>
+                        Sell
+                      <% } else if (txn.type === 'deposit') { %>
+                        <i class="fas fa-arrow-down me-1"></i>
+                        Deposit
+                      <% } else if (txn.type === 'withdraw') { %>
+                        <i class="fas fa-arrow-up me-1"></i>
+                        Withdraw
                       <% } %>
                     </span>
                   </td>
                   <td data-label="Amount">
-                    <strong class="<%= txn.type === 'deposit' || (txn.type === 'trade' && txn.tradeType === 'sell') ? 'text-success' : 'text-danger' %>">
-                      <%= txn.type === 'deposit' || (txn.type === 'trade' && txn.tradeType === 'sell') ? '+' : '-' %>$<%= Math.abs(txn.amount).toFixed(2) %>
+                    <% 
+                      const isPositiveAmount = txn.type === 'deposit' || txn.type === 'stock_sell';
+                      const displayAmount = Math.abs(txn.amount).toFixed(2);
+                    %>
+                    <strong class="<%= isPositiveAmount ? 'text-success' : 'text-danger' %>">
+                      <%= isPositiveAmount ? '+' : '-' %>$<%= displayAmount %>
                     </strong>
                   </td>
                   <td data-label="Description">
-                    <% if (txn.type === 'trade') { %>
+                    <% if (txn.type === 'stock_buy' || txn.type === 'stock_sell') { %>
                       <div>
                         <strong class="me-2"><%= txn.stockSymbol %></strong>
                         <%= txn.description %>

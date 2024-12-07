@@ -64,11 +64,17 @@ router.post('/add-funds', async (req, res) => {
     // Create transaction record
     const transaction = await Transaction.create({
       userEmail: user.email,
+      userId: req.oidc.user.sub,
       type: 'deposit',
       amount: amount,
       balance: updatedUser.walletBalance,
-      description: 'Added funds to wallet'
+      description: 'Added funds to wallet',
+      status: 'completed'
     });
+
+    if (!transaction) {
+      console.warn('Transaction creation failed');
+    }
 
     res.json({
       success: true,
@@ -128,11 +134,17 @@ router.post('/withdraw-funds', async (req, res) => {
     // Create transaction record
     const transaction = await Transaction.create({
       userEmail: user.email,
+      userId: req.oidc.user.sub,
       type: 'withdraw',
-      amount: amount,
+      amount: -amount,
       balance: updatedUser.walletBalance,
-      description: 'Withdrawn funds from wallet'
+      description: 'Withdrawn funds from wallet',
+      status: 'completed'
     });
+
+    if (!transaction) {
+      console.warn('Transaction creation failed');
+    }
 
     res.json({
       success: true,
@@ -165,11 +177,14 @@ router.get('/transaction-history', async (req, res) => {
     }
 
     // Get total count for pagination
-    const totalTransactions = await Transaction.countDocuments({ userEmail: user.email });
+    const totalTransactions = await Transaction.countDocuments({ userEmail: user.email, userId: req.oidc.user.sub });
     const totalPages = Math.ceil(totalTransactions / limit);
 
     // Get transactions for current page
-    const transactions = await Transaction.find({ userEmail: user.email })
+    const transactions = await Transaction.find({ 
+      userEmail: user.email,
+      userId: req.oidc.user.sub
+    })
       .sort({ date: -1 })
       .skip(skip)
       .limit(limit);
@@ -185,9 +200,15 @@ router.get('/transaction-history', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching transaction history:', err);
-    res.status(500).render('error', {
-      message: 'Error loading transaction history',
-      error: err
+    res.render('transaction-history', {
+      user: req.oidc.user,
+      transactions: [],
+      currentPage: 1,
+      totalPages: 0,
+      hasPrevPage: false,
+      hasNextPage: false,
+      isAuthenticated: req.oidc.isAuthenticated(),
+      error: 'Failed to load transactions. Please try again.'
     });
   }
 });

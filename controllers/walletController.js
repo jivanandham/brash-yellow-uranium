@@ -23,9 +23,12 @@ exports.addFunds = async (req, res) => {
 
     const transaction = new Transaction({
       userEmail: req.oidc.user.email,
+      userId: req.oidc.user.sub,
       type: 'deposit',
       amount,
+      balance: user.walletBalance,
       description: 'Funds added to wallet',
+      status: 'completed'
     });
     await transaction.save();
 
@@ -50,9 +53,12 @@ exports.withdrawFunds = async (req, res) => {
 
     const transaction = new Transaction({
       userEmail: req.oidc.user.email,
+      userId: req.oidc.user.sub,
       type: 'withdraw',
-      amount,
+      amount: -amount,
+      balance: user.walletBalance,
       description: 'Funds withdrawn from wallet',
+      status: 'completed'
     });
     await transaction.save();
 
