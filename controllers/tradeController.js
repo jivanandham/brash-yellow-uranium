@@ -9,12 +9,11 @@ const stockPriceService = require('../services/stockPriceService');
 // Function to update user holdings after a trade
 async function updateHoldings(userId, userEmail, symbol, companyName, type, quantity, price) {
     try {
-        let holding = await Holding.findOne({ userId, symbol });
+        let holding = await Holding.findOne({ userEmail, symbol });
         
         if (!holding) {
             // Create new holding if it doesn't exist
             holding = new Holding({
-                userId,
                 userEmail,
                 symbol,
                 companyName,
@@ -77,7 +76,7 @@ async function updateHoldings(userId, userEmail, symbol, companyName, type, quan
 
         // If quantity becomes 0, remove the holding
         if (holding.quantity === 0) {
-            await Holding.deleteOne({ userId, symbol });
+            await Holding.deleteOne({ userEmail, symbol });
             console.log(`Removed holding for ${symbol} as quantity is 0`);
         } else {
             holding.lastUpdated = new Date();
@@ -135,6 +134,7 @@ exports.executeTrade = async (req, res) => {
         
         const { type, symbol, companyName, quantity, price } = req.body;
         const userEmail = req.oidc.user.email;
+        const userId = req.oidc.user.sub;  // Auth0 ID
 
         // Validate input
         if (!type || !symbol || !companyName || !quantity || !price) {
@@ -158,13 +158,19 @@ exports.executeTrade = async (req, res) => {
             });
         }
 
-        // Get user
-        const user = await User.findOne({ email: userEmail });
+        // Get or create user
+        let user = await User.findOne({ email: userEmail });
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
+            // Create new user if not exists
+            user = new User({
+                _id: userId,  // Use Auth0 ID as MongoDB _id
+                email: userEmail,
+                name: req.oidc.user.name || userEmail.split('@')[0],
+                picture: req.oidc.user.picture,
+                role: 'user'
             });
+            await user.save();
+            console.log('Created new user:', user);
         }
 
         const totalValue = quantity * price;
@@ -184,9 +190,9 @@ exports.executeTrade = async (req, res) => {
             
             console.log('Buy trade - Updated wallet balance:', user.walletBalance);
         } else if (type === 'sell') {
-            // Get current holdings
+            // Get current holdings using user's email
             const holding = await Holding.findOne({ 
-                userId: req.oidc.user.sub,
+                userEmail: userEmail,
                 symbol: symbol
             });
 
@@ -211,8 +217,8 @@ exports.executeTrade = async (req, res) => {
 
         // Create order
         const order = new Order({
-            userId: req.oidc.user.sub,  
-            userEmail: userEmail,  
+            userId: userId,  // Include Auth0 ID
+            userEmail: userEmail,
             symbol,
             companyName,
             type,
@@ -225,7 +231,7 @@ exports.executeTrade = async (req, res) => {
 
         // Create transaction
         const transaction = new Transaction({
-            userId: req.oidc.user.sub,  
+            userId: userId,  // Include Auth0 ID
             userEmail: userEmail,
             type: 'stock_' + type,
             amount: type === 'buy' ? -totalValue : totalValue,
@@ -239,11 +245,6 @@ exports.executeTrade = async (req, res) => {
             date: new Date()
         });
 
-        console.log('Saving trade records:', {
-            order: order.toObject(),
-            transaction: transaction.toObject()
-        });
-
         try {
             // Save everything and update holdings
             const [savedUser, savedOrder, savedTransaction] = await Promise.all([
@@ -253,7 +254,7 @@ exports.executeTrade = async (req, res) => {
             ]);
 
             // Update holdings after saving order and transaction
-            await updateHoldings(req.oidc.user.sub, userEmail, symbol, companyName, type, quantity, price);
+            await updateHoldings(userEmail, userEmail, symbol, companyName, type, quantity, price);
 
             console.log('Successfully saved all trade records and updated holdings');
 

@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
 
 const holdingSchema = new mongoose.Schema({
-    userId: {
-        type: String,  // Auth0 ID
-        required: true,
-        index: true
-    },
     userEmail: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     symbol: {
         type: String,
@@ -40,8 +36,8 @@ const holdingSchema = new mongoose.Schema({
     }
 });
 
-// Compound index to ensure a user can't have duplicate holdings for the same stock
-holdingSchema.index({ userId: 1, symbol: 1 }, { unique: true });
+// Create a compound index on userEmail and symbol to ensure uniqueness
+holdingSchema.index({ userEmail: 1, symbol: 1 }, { unique: true });
 
 // Pre-save middleware to update lastUpdated
 holdingSchema.pre('save', function(next) {
@@ -50,13 +46,13 @@ holdingSchema.pre('save', function(next) {
 });
 
 // Method to calculate current value
-holdingSchema.methods.getCurrentValue = function() {
-    return this.quantity * this.averagePrice;
+holdingSchema.methods.getCurrentValue = function(currentPrice) {
+    return this.quantity * currentPrice;
 };
 
 // Method to calculate profit/loss
 holdingSchema.methods.getProfitLoss = function(currentPrice) {
-    const currentValue = this.quantity * currentPrice;
+    const currentValue = this.getCurrentValue(currentPrice);
     const investmentValue = this.quantity * this.averagePrice;
     return currentValue - investmentValue;
 };
