@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { requiresAuth } = require('express-openid-connect');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 
 // Middleware to check authentication
 router.use(requiresAuth());
@@ -10,6 +11,8 @@ router.use(requiresAuth());
 router.get('/', async (req, res) => {
     try {
         const userId = req.oidc.user.sub;
+        const userEmail = req.oidc.user.email;
+
         const notifications = await Notification.find({ 
             userId,
             status: { $ne: 'archived' }
@@ -22,10 +25,17 @@ router.get('/', async (req, res) => {
             userId,
             status: 'unread'
         });
+
+        // Fetch user data including wallet balance
+        const userData = await User.findOne({ email: userEmail });
+        const userWithWallet = {
+            ...req.oidc.user,
+            walletBalance: userData ? userData.walletBalance : 0
+        };
         
         res.render('notifications', {
             isAuthenticated: req.oidc.isAuthenticated(),
-            user: req.oidc.user,
+            user: userWithWallet,
             notifications,
             unreadCount,
             error: null
@@ -34,7 +44,10 @@ router.get('/', async (req, res) => {
         console.error('Error loading notifications:', error);
         res.render('notifications', {
             isAuthenticated: req.oidc.isAuthenticated(),
-            user: req.oidc.user,
+            user: {
+                ...req.oidc.user,
+                walletBalance: 0
+            },
             notifications: [],
             unreadCount: 0,
             error: 'Failed to load notifications'

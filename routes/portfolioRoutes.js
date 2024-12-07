@@ -4,10 +4,69 @@ const { requiresAuth } = require('express-openid-connect');
 const Order = require('../models/Order');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const portfolioService = require('../services/portfolioService');
 const stockPriceService = require('../services/stockPriceService');
 
 // Middleware to check authentication
 router.use(requiresAuth());
+
+// Get portfolio page
+router.get('/', async (req, res) => {
+    try {
+        const userEmail = req.oidc.user.email;
+        
+        // Get user data
+        const user = await User.findOne({ email: userEmail });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // Get portfolio metrics using centralized service
+        const portfolioMetrics = await portfolioService.calculatePortfolioMetrics(userEmail);
+
+        // Get recent transactions
+        const recentTransactions = await Transaction.find({ userEmail })
+            .sort({ timestamp: -1 })
+            .limit(5);
+
+        // Get recent orders
+        const recentOrders = await Order.find({ userId: userEmail })
+            .sort({ orderDate: -1 })
+            .limit(5);
+
+        res.render('portfolio', {
+            user,
+            portfolio: portfolioMetrics,
+            transactions: recentTransactions,
+            orders: recentOrders,
+            isAuthenticated: true
+        });
+    } catch (error) {
+        console.error('Portfolio error:', error);
+        res.render('error', { 
+            error: 'Error loading portfolio data',
+            isAuthenticated: true
+        });
+    }
+});
+
+// Get portfolio data (API endpoint)
+router.get('/api/data', async (req, res) => {
+    try {
+        const userEmail = req.oidc.user.email;
+        const portfolioMetrics = await portfolioService.calculatePortfolioMetrics(userEmail);
+        res.json({
+            success: true,
+            portfolio: portfolioMetrics
+        });
+    } catch (error) {
+        console.error('Portfolio API error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching portfolio data'
+        });
+    }
+});
 
 // Buy stock route
 router.post('/buy', async (req, res) => {
@@ -45,7 +104,7 @@ router.post('/buy', async (req, res) => {
 
         // Create order
         const order = new Order({
-            userId: user.email, // Use email as userId for consistency
+            userId: user.email,
             symbol,
             companyName: companyInfo.name,
             type: 'buy',
@@ -87,6 +146,9 @@ router.post('/buy', async (req, res) => {
             transaction.save()
         ]);
 
+        // Get updated portfolio metrics
+        const portfolioMetrics = await portfolioService.calculatePortfolioMetrics(user.email);
+
         res.json({
             success: true,
             message: 'Stock purchased successfully',
@@ -96,117 +158,14 @@ router.post('/buy', async (req, res) => {
                 price,
                 total: totalCost
             },
-            newBalance: updatedUser.walletBalance
+            newBalance: updatedUser.walletBalance,
+            portfolio: portfolioMetrics
         });
     } catch (error) {
-        console.error('Error buying stock:', error);
+        console.error('Buy stock error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to purchase stock'
-        });
-    }
-});
-
-// Get portfolio page
-router.get('/', async (req, res) => {
-    try {
-        const userEmail = req.oidc.user.email;
-        const orders = await Order.find({ userId: userEmail, status: 'completed' });
-        
-        // Get all unique symbols from orders
-        const symbols = [...new Set(orders.map(order => order.symbol))];
-        const quotes = await stockPriceService.getBatchQuotes(symbols);
-        
-        // Calculate holdings
-        const holdingsMap = new Map();
-        
-        // Process all orders chronologically
-        orders.sort((a, b) => a.createdAt - b.createdAt).forEach(order => {
-            const quote = quotes[order.symbol];
-            if (!quote) return;
-
-            let holding = holdingsMap.get(order.symbol) || {
-                symbol: order.symbol,
-                companyName: order.companyName,
-                quantity: 0,
-                avgPrice: 0,
-                totalInvestment: 0,
-                currentPrice: quote.price,
-                currentValue: 0,
-                profitLoss: 0,
-                profitLossPercent: 0
-            };
-
-            if (order.type === 'buy') {
-                // Update holding for buy orders
-                const newQuantity = holding.quantity + order.quantity;
-                const newInvestment = holding.totalInvestment + (order.quantity * order.price);
-                
-                holding.quantity = newQuantity;
-                holding.totalInvestment = newInvestment;
-                holding.avgPrice = newInvestment / newQuantity;
-            } else if (order.type === 'sell') {
-                // Update holding for sell orders
-                const newQuantity = holding.quantity - order.quantity;
-                // Calculate the portion of investment being sold
-                const soldInvestment = (order.quantity / holding.quantity) * holding.totalInvestment;
-                holding.totalInvestment -= soldInvestment;
-                holding.quantity = newQuantity;
-                
-                if (newQuantity > 0) {
-                    holding.avgPrice = holding.totalInvestment / newQuantity;
-                } else {
-                    // If all shares are sold, remove from holdings
-                    holdingsMap.delete(order.symbol);
-                    return;
-                }
-            }
-
-            // Update current values
-            holding.currentValue = holding.quantity * quote.price;
-            holding.profitLoss = holding.currentValue - holding.totalInvestment;
-            holding.profitLossPercent = (holding.profitLoss / holding.totalInvestment) * 100;
-
-            holdingsMap.set(order.symbol, holding);
-        });
-
-        const holdings = Array.from(holdingsMap.values());
-
-        // Calculate portfolio totals
-        const totals = holdings.reduce((acc, holding) => {
-            acc.totalInvestment += holding.totalInvestment;
-            acc.totalCurrentValue += holding.currentValue;
-            acc.totalProfitLoss += holding.profitLoss;
-            return acc;
-        }, {
-            totalInvestment: 0,
-            totalCurrentValue: 0,
-            totalProfitLoss: 0
-        });
-
-        totals.totalProfitLossPercent = totals.totalInvestment > 0 
-            ? (totals.totalProfitLoss / totals.totalInvestment) * 100 
-            : 0;
-
-        res.render('portfolio', {
-            isAuthenticated: req.oidc.isAuthenticated(),
-            user: req.oidc.user,
-            holdings,
-            totals
-        });
-    } catch (error) {
-        console.error('Error loading portfolio:', error);
-        res.render('portfolio', {
-            isAuthenticated: req.oidc.isAuthenticated(),
-            user: req.oidc.user,
-            holdings: [],
-            totals: {
-                totalInvestment: 0,
-                totalCurrentValue: 0,
-                totalProfitLoss: 0,
-                totalProfitLossPercent: 0
-            },
-            error: 'Error loading portfolio'
+            message: 'Error processing buy order'
         });
     }
 });

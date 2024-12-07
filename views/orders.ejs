@@ -52,6 +52,7 @@
                                 <th>Price</th>
                                 <th>Total</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,6 +81,13 @@
                                             <%= order.status.toUpperCase() %>
                                         </span>
                                     </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" 
+                                                onclick="getStockPrice('<%= order.symbol %>', '<%= order.companyName %>')"
+                                                title="Buy <%= order.symbol %> again">
+                                            <i class="fas fa-shopping-cart"></i> Buy Again
+                                        </button>
+                                    </td>
                                 </tr>
                             <% }); %>
                         </tbody>
@@ -98,11 +106,19 @@
         </div>
     </div>
 
+    <!-- Include Trade Modal -->
+    <%- include('partials/trade-modal') %>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Initialize modals
+        const tradeModal = new bootstrap.Modal(document.getElementById('tradeModal'));
+        const successModal = new bootstrap.Modal(document.getElementById('tradeSuccessModal'));
+        let currentWalletBalance = parseFloat(document.querySelector('.wallet-balance').textContent.replace('$', ''));
+
         // Filter orders
-        document.getElementById('typeFilter').addEventListener('change', filterOrders);
-        document.getElementById('statusFilter').addEventListener('change', filterOrders);
+        document.getElementById('typeFilter')?.addEventListener('change', filterOrders);
+        document.getElementById('statusFilter')?.addEventListener('change', filterOrders);
 
         function filterOrders() {
             const type = document.getElementById('typeFilter').value;
@@ -149,6 +165,139 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        // Get stock price and open trade modal
+        async function getStockPrice(symbol, companyName) {
+            try {
+                const response = await fetch(`/trade/price?symbol=${symbol}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    openTradeModal('buy', symbol, data.price, companyName || symbol);
+                } else {
+                    showAlert(data.message || 'Failed to fetch stock price', 'danger');
+                }
+            } catch (error) {
+                console.error('Error fetching stock price:', error);
+                showAlert('Error fetching stock price', 'danger');
+            }
+        }
+
+        // Open trade modal
+        function openTradeModal(type, symbol, price, company) {
+            document.getElementById('type').value = type;
+            document.getElementById('symbol').value = symbol;
+            document.getElementById('companyName').value = company;
+            document.getElementById('currentPrice').value = parseFloat(price).toFixed(2);
+            document.getElementById('quantity').value = '';
+            document.getElementById('totalValue').value = '';
+            document.getElementById('availableBalance').value = currentWalletBalance.toFixed(2);
+            
+            const modalTitle = document.getElementById('tradeModalLabel');
+            const executeBtn = document.getElementById('executeTradeBtn');
+            
+            modalTitle.textContent = 'Buy Stock';
+            executeBtn.textContent = 'Buy';
+            executeBtn.className = 'btn btn-success';
+            
+            tradeModal.show();
+        }
+
+        // Calculate total value when quantity changes
+        document.getElementById('quantity').addEventListener('input', function(e) {
+            const quantity = parseInt(e.target.value) || 0;
+            const price = parseFloat(document.getElementById('currentPrice').value);
+            const totalValue = (quantity * price).toFixed(2);
+            document.getElementById('totalValue').value = totalValue;
+            
+            const submitBtn = document.getElementById('executeTradeBtn');
+            
+            if (quantity <= 0) {
+                e.target.classList.add('is-invalid');
+                submitBtn.disabled = true;
+            } else if (quantity * price > currentWalletBalance) {
+                e.target.classList.add('is-invalid');
+                submitBtn.disabled = true;
+                showAlert('Insufficient funds for this trade', 'danger');
+            } else {
+                e.target.classList.remove('is-invalid');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Execute trade
+        document.getElementById('tradeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const executeBtn = document.getElementById('executeTradeBtn');
+            executeBtn.disabled = true;
+            
+            try {
+                const formData = {
+                    type: document.getElementById('type').value,
+                    symbol: document.getElementById('symbol').value,
+                    quantity: parseInt(document.getElementById('quantity').value),
+                    price: parseFloat(document.getElementById('currentPrice').value)
+                };
+                
+                console.log('Executing trade:', formData);
+                
+                const response = await fetch('/trade/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                console.log('Trade response:', result);
+                
+                if (result.success) {
+                    // Update wallet balance
+                    currentWalletBalance = result.newBalance;
+                    document.querySelectorAll('.wallet-balance').forEach(el => {
+                        el.textContent = `$${result.newBalance.toFixed(2)}`;
+                    });
+                    
+                    // Show success message
+                    document.getElementById('successMessage').textContent = result.message;
+                    document.getElementById('successDetails').textContent = 
+                        `Total Value: $${(formData.quantity * formData.price).toFixed(2)} | New Balance: $${result.newBalance.toFixed(2)}`;
+                    
+                    tradeModal.hide();
+                    successModal.show();
+                    
+                    // Refresh the page after a delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showAlert(result.message || 'Failed to execute trade', 'danger');
+                    executeBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error executing trade:', error);
+                showAlert('An error occurred while executing the trade', 'danger');
+                executeBtn.disabled = false;
+            }
+        });
+
+        // Show alert message
+        function showAlert(message, type, duration = 3000) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, duration);
         }
     </script>
     <%- include('partials/footer') %>

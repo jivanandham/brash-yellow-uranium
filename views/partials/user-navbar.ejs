@@ -53,7 +53,7 @@
         <li class="nav-item">
           <a class="nav-link" href="/wallet">
             <i class="fas fa-wallet"></i> Wallet
-            <span class="wallet-balance ms-2">$<%= typeof user !== 'undefined' && user.walletBalance ? user.walletBalance.toFixed(2) : '0.00' %></span>
+            <span class="wallet-balance ms-2">$<%= typeof user !== 'undefined' && user.walletBalance ? parseFloat(user.walletBalance).toFixed(2) : '0.00' %></span>
           </a>
         </li>
         <li class="nav-item">

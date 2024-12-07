@@ -72,11 +72,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <h5>Total Investment</h5>
-                                <h4 class="text-primary">$<%= totals.totalInvestment.toFixed(2) %></h4>
+                                <h4 class="text-primary">$<%= portfolio.totalInvestment.toFixed(2) %></h4>
                             </div>
                             <div class="col-md-6">
                                 <h5>Current Value</h5>
-                                <h4 class="text-primary">$<%= totals.totalCurrentValue.toFixed(2) %></h4>
+                                <h4 class="text-primary">$<%= portfolio.totalCurrentValue.toFixed(2) %></h4>
                             </div>
                         </div>
                     </div>
@@ -89,18 +89,15 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <h5>Today's P/L</h5>
-                                <h4 class="<%= totals.todayPL >= 0 ? 'text-success' : 'text-danger' %>">
-                                    <%= totals.todayPL >= 0 ? '+' : '' %>$<%= totals.todayPL.toFixed(2) %>
-                                    <small>(<%= totals.todayPLPercent.toFixed(2) %>%)</small>
+                                <h5>Total P/L</h5>
+                                <h4 class="<%= portfolio.totalProfitLoss >= 0 ? 'text-success' : 'text-danger' %>">
+                                    <%= portfolio.totalProfitLoss >= 0 ? '+' : '' %>$<%= portfolio.totalProfitLoss.toFixed(2) %>
+                                    <small>(<%= portfolio.totalProfitLossPercent.toFixed(2) %>%)</small>
                                 </h4>
                             </div>
                             <div class="col-md-6">
-                                <h5>Total P/L</h5>
-                                <h4 class="<%= totals.totalProfitLoss >= 0 ? 'text-success' : 'text-danger' %>">
-                                    <%= totals.totalProfitLoss >= 0 ? '+' : '' %>$<%= totals.totalProfitLoss.toFixed(2) %>
-                                    <small>(<%= totals.totalProfitLossPercent.toFixed(2) %>%)</small>
-                                </h4>
+                                <h5>Wallet Balance</h5>
+                                <h4 class="text-primary">$<%= user.walletBalance.toFixed(2) %></h4>
                             </div>
                         </div>
                     </div>
@@ -108,64 +105,50 @@
             </div>
         </div>
 
-        <!-- Market Overview -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="market-card">
-                    <div class="card-header bg-transparent border-0">
-                        <h4 class="mb-0">Market Overview</h4>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="marketChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Holdings and Watchlist -->
         <div class="row">
-            <!-- Top Holdings -->
-            <div class="col-md-8">
+            <!-- Holdings Table -->
+            <div class="col-md-12">
                 <div class="market-card mb-4">
                     <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">Top Holdings</h4>
-                        <a href="/portfolio" class="btn btn-sm btn-primary">View All</a>
+                        <h4 class="mb-0">Current Holdings</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Symbol</th>
                                         <th>Company</th>
                                         <th>Quantity</th>
+                                        <th>Avg Price</th>
                                         <th>Current Price</th>
-                                        <th>Today's P/L</th>
-                                        <th>Market Value</th>
-                                        <th>Total P/L</th>
+                                        <th>Total Value</th>
+                                        <th>Profit/Loss</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (holdings && holdings.length > 0) { %>
-                                        <% holdings.slice(0, 5).forEach(holding => { %>
+                                    <% if (portfolio.holdings && portfolio.holdings.length > 0) { %>
+                                        <% portfolio.holdings.forEach(holding => { %>
                                             <tr>
                                                 <td><%= holding.symbol %></td>
                                                 <td><%= holding.companyName %></td>
                                                 <td><%= holding.quantity %></td>
+                                                <td>$<%= holding.avgPrice.toFixed(2) %></td>
                                                 <td>$<%= holding.currentPrice.toFixed(2) %></td>
-                                                <td class="<%= holding.todayPL >= 0 ? 'text-success' : 'text-danger' %>">
-                                                    <%= holding.todayPL >= 0 ? '+' : '' %>$<%= holding.todayPL.toFixed(2) %>
-                                                    <small>(<%= holding.todayPLPercent.toFixed(2) %>%)</small>
-                                                </td>
                                                 <td>$<%= holding.currentValue.toFixed(2) %></td>
-                                                <td class="<%= holding.profitLoss >= 0 ? 'text-success' : 'text-danger' %>">
-                                                    <%= holding.profitLoss >= 0 ? '+' : '' %>$<%= holding.profitLoss.toFixed(2) %>
+                                                <td class="text-<%= holding.profitLoss >= 0 ? 'success' : 'danger' %>">
+                                                    $<%= holding.profitLoss.toFixed(2) %>
+                                                    (<%= holding.profitLossPercent.toFixed(2) %>%)
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-primary btn-sm" onclick="openTradeModal('<%= holding.symbol %>', <%= holding.currentPrice %>)">Trade</button>
                                                 </td>
                                             </tr>
                                         <% }); %>
                                     <% } else { %>
                                         <tr>
-                                            <td colspan="7" class="text-center">No holdings found. Start investing to build your portfolio!</td>
+                                            <td colspan="8" class="text-center">No holdings found</td>
                                         </tr>
                                     <% } %>
                                 </tbody>
@@ -174,101 +157,15 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Watchlist -->
-            <div class="col-md-4">
-                <div class="market-card mb-4">
-                    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">Watchlist</h4>
-                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addToWatchlistModal">
-                            <i class="bi bi-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="watchlist-items">
-                            <!-- Watchlist items will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Add to Watchlist Modal -->
-    <div class="modal fade" id="addToWatchlistModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add to Watchlist</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control" id="stockSearch" placeholder="Search for stocks...">
-                    <div id="searchResults" class="mt-3"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Trade Modal -->
+    <%- include('partials/trade-modal') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Market Overview Chart
-        const ctx = document.getElementById('marketChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Portfolio Value',
-                    data: [65, 59, 80, 81, 56, 55],
-                    borderColor: '#1a237e',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false
-                    }
-                }
-            }
-        });
-
-        // Stock Search
-        document.getElementById('stockSearch').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toUpperCase();
-            const resultsContainer = document.getElementById('searchResults');
-            
-            if (searchTerm.length < 2) {
-                resultsContainer.innerHTML = '';
-                return;
-            }
-
-            // TODO: Implement actual stock search API call
-            // This is just a placeholder
-            const mockResults = [
-                { symbol: 'AAPL', name: 'Apple Inc.' },
-                { symbol: 'GOOGL', name: 'Alphabet Inc.' },
-                { symbol: 'MSFT', name: 'Microsoft Corporation' }
-            ].filter(stock => 
-                stock.symbol.includes(searchTerm) || 
-                stock.name.toUpperCase().includes(searchTerm)
-            );
-
-            resultsContainer.innerHTML = mockResults.map(stock => `
-                <div class="stock-result p-2 border-bottom">
-                    <strong>${stock.symbol}</strong> - ${stock.name}
-                </div>
-            `).join('');
-        });
-    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/trade.js"></script>
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>

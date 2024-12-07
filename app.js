@@ -26,6 +26,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const tradeRoutes = require('./routes/trade');
+const stockRoutes = require('./routes/stockRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 app.set('view engine', 'ejs');
@@ -121,6 +123,8 @@ app.use('/notifications', requiresAuth(), notificationRoutes);
 app.use('/api', apiRoutes);
 app.use('/portfolio', requiresAuth(), portfolioRoutes);
 app.use('/blog', blogRoutes);
+app.use('/trade', requiresAuth(), tradeRoutes);
+app.use('/stock', requiresAuth(), stockRoutes);
 
 // Error handler
 app.use(errorHandler);

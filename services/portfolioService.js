@@ -1,17 +1,11 @@
-const express = require('express');
-const User = require('../models/User');
-const ErrorLog = require('../models/ErrorLog');
-const Transaction = require('../models/Transaction');
 const Order = require('../models/Order');
-const portfolioService = require('../services/portfolioService');
+const stockPriceService = require('./stockPriceService');
 
-const router = express.Router();
-
-// Helper function to calculate portfolio metrics
+// Centralized function to calculate portfolio metrics
 async function calculatePortfolioMetrics(userId) {
     const orders = await Order.find({ userId, status: 'completed' });
     const symbols = [...new Set(orders.map(order => order.symbol))];
-    const quotes = await portfolioService.getBatchQuotes(symbols);
+    const quotes = await stockPriceService.getBatchQuotes(symbols);
     
     // Calculate holdings
     const holdingsMap = new Map();
@@ -31,7 +25,8 @@ async function calculatePortfolioMetrics(userId) {
             currentValue: 0,
             profitLoss: 0,
             profitLossPercent: 0,
-            priceChange: quote.change
+            priceChange: quote.change,
+            lastUpdated: new Date()
         };
 
         if (order.type === 'buy') {
@@ -95,71 +90,11 @@ async function calculatePortfolioMetrics(userId) {
         totalCurrentValue: totals.totalCurrentValue,
         totalProfitLoss: totals.totalProfitLoss,
         totalProfitLossPercent: totals.totalProfitLossPercent,
-        holdings
+        holdings,
+        lastUpdated: new Date()
     };
 }
 
-// Role-Based Dashboard Route
-router.get('/', async (req, res) => {
-    try {
-        const userEmail = req.oidc.user.email;
-        
-        // Get user data
-        const user = await User.findOne({ email: userEmail });
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        // Get portfolio metrics using centralized service
-        const portfolioMetrics = await portfolioService.calculatePortfolioMetrics(userEmail);
-
-        // Get recent transactions
-        const recentTransactions = await Transaction.find({ userEmail })
-            .sort({ timestamp: -1 })
-            .limit(5);
-
-        // Get recent orders
-        const recentOrders = await Order.find({ userId: userEmail })
-            .sort({ orderDate: -1 })
-            .limit(5);
-
-        res.render('user-dashboard', {
-            user,
-            portfolio: portfolioMetrics,
-            transactions: recentTransactions,
-            orders: recentOrders
-        });
-    } catch (error) {
-        console.error('Dashboard error:', error);
-        await ErrorLog.create({
-            userId: req.oidc.user.email,
-            error: error.message,
-            stack: error.stack,
-            route: '/dashboard'
-        });
-        res.status(500).render('error', { 
-            error: 'Error loading dashboard'
-        });
-    }
-});
-
-// Admin Dashboard Route
-router.get('/admin/dashboard', async (req, res) => {
-    try {
-        const users = await User.find(); // Fetch users
-        const errorLogs = await ErrorLog.find().sort({ timestamp: -1 }); // Fetch error logs
-        const transactions = await Transaction.find().sort({ date: -1 }); // Fetch transactions
-
-        res.render('admin-dashboard', {
-            user: req.oidc.user, // Authenticated user details
-            users,
-            errorLogs,
-            transactions,
-        });
-    } catch (err) {
-        console.error('Error fetching admin data:', err);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-module.exports = router;
+module.exports = {
+    calculatePortfolioMetrics
+};

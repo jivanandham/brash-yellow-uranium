@@ -12,20 +12,12 @@
             margin: 2rem auto;
             padding: 0 1rem;
         }
-        .profile-action-btn {
-            padding: 0.5rem 1rem;
-            margin: 0 0.25rem;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-        .profile-action-btn.active {
-            background-color: #0d6efd;
-            color: white;
-        }
         .stock-card {
             border-radius: 10px;
             transition: transform 0.2s;
             margin-bottom: 1rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .stock-card:hover {
             transform: translateY(-2px);
@@ -44,76 +36,74 @@
         .stock-card:hover .stock-actions {
             opacity: 1;
         }
-        .refresh-btn {
-            animation: spin 1s linear infinite;
-            display: none;
+        .refresh-icon {
+            transition: transform 0.5s ease;
         }
-        .refreshing .refresh-btn {
-            display: inline-block;
+        .refresh-icon.spinning {
+            animation: spin 1s linear infinite;
         }
         @keyframes spin {
             100% { transform: rotate(360deg); }
         }
-        /* Table Styling */
         .watchlist-table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-            table-layout: fixed;
-        }
-        .watchlist-table th,
-        .watchlist-table td {
-            width: 20%; /* Equal width for all columns (100% / 5 columns) */
-            padding: 15px;
-            vertical-align: middle;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .watchlist-table th {
             background-color: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
             font-weight: 600;
-            text-align: left;
-            white-space: nowrap;
+            padding: 1rem;
+            border-bottom: 2px solid #dee2e6;
         }
         .watchlist-table td {
-            border-bottom: 1px solid #dee2e6;
+            padding: 1rem;
+            vertical-align: middle;
         }
         .watchlist-table tbody tr:hover {
             background-color: #f8f9fa;
         }
-        .company-name {
+        .price-change {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
             font-weight: 500;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
         }
-        .company-sector {
-            font-size: 0.85rem;
+        .price-change.positive {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        .price-change.negative {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .search-result-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        .stock-symbol {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .last-updated {
+            font-size: 0.8rem;
             color: #6c757d;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-        .price-column, 
-        .change-column {
-            text-align: right;
-            font-family: monospace;
-            font-size: 1.1rem;
-        }
-        .actions-column {
-            text-align: right;
-        }
-        .btn-group {
-            display: inline-flex;
-            gap: 5px;
-            justify-content: flex-end;
-            width: 100%;
-        }
-        .btn-group .btn {
-            padding: 0.375rem 0.75rem;
-            flex-shrink: 0;
         }
     </style>
 </head>
@@ -122,101 +112,75 @@
     <%- include('partials/user-navbar') %>
 
     <div class="watchlist-container">
-        <div class="d-none">
-            <span class="wallet-balance">$<%= typeof user.walletBalance !== 'undefined' ? user.walletBalance.toFixed(2) : '0.00' %></span>
-        </div>
-
+        <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>My Watchlist</h2>
-            <div>
-                <button class="btn btn-outline-primary me-2" onclick="refreshWatchlist()" data-bs-toggle="tooltip" title="Refresh Prices">
-                    <i class="fas fa-sync-alt"></i>
+            <h2>Watchlist</h2>
+            <div class="btn-group">
+                <button class="btn btn-outline-primary" onclick="refreshWatchlist()">
+                    <i class="fas fa-sync-alt refresh-icon me-2"></i> Refresh
                 </button>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
-                    <i class="fas fa-plus"></i> Add Stock
+                    <i class="fas fa-plus me-2"></i> Add Stock
                 </button>
             </div>
         </div>
 
-        <div class="filter-group mb-4">
-            <button class="btn btn-outline-secondary profile-action-btn active" onclick="filterStocks('all')">All Stocks</button>
-            <button class="btn btn-outline-success profile-action-btn" onclick="filterStocks('gainers')">Gainers</button>
-            <button class="btn btn-outline-danger profile-action-btn" onclick="filterStocks('losers')">Losers</button>
-        </div>
-
+        <!-- Watchlist Table -->
         <div class="table-responsive">
             <table class="table watchlist-table">
                 <thead>
                     <tr>
-                        <th onclick="sortStocks('symbol')" style="cursor: pointer">
-                            Symbol <i class="fas fa-sort"></i>
-                        </th>
-                        <th>Company</th>
-                        <th class="text-end" onclick="sortStocks('price')" style="cursor: pointer">
-                            Price <i class="fas fa-sort"></i>
-                        </th>
-                        <th class="text-end" onclick="sortStocks('change')" style="cursor: pointer">
-                            Change <i class="fas fa-sort"></i>
-                        </th>
-                        <th class="text-end">Actions</th>
+                        <th style="width: 25%">Stock</th>
+                        <th style="width: 20%">Sector</th>
+                        <th style="width: 15%" class="text-end">Price</th>
+                        <th style="width: 15%" class="text-end">Change</th>
+                        <th style="width: 15%" class="text-end">Last Updated</th>
+                        <th style="width: 10%" class="text-end">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="watchlistBody">
-                    <% watchlist.forEach(stock => { %>
+                <tbody>
+                    <% if (watchlist && watchlist.length > 0) { %>
+                        <% watchlist.forEach(stock => { %>
+                            <tr id="stock-<%= stock.symbol %>">
+                                <td>
+                                    <div class="stock-symbol"><%= stock.symbol %></div>
+                                    <div class="company-name text-muted"><%= stock.name %></div>
+                                </td>
+                                <td><%= stock.sector %></td>
+                                <td class="text-end price-value">$<%= stock.lastPrice.toFixed(2) %></td>
+                                <td class="text-end">
+                                    <span class="price-change <%= stock.priceChange >= 0 ? 'positive' : 'negative' %>">
+                                        <%= stock.priceChange >= 0 ? '+' : '' %><%= stock.priceChange.toFixed(2) %>%
+                                    </span>
+                                </td>
+                                <td class="text-end last-updated">
+                                    <%= new Date(stock.lastUpdated).toLocaleString() %>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="openTradeModal('buy', '<%= stock.symbol %>', <%= stock.lastPrice %>)">
+                                            Buy
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromWatchlist('<%= stock.symbol %>')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
                         <tr>
-                            <td>
-                                <strong><%= stock.symbol %></strong>
-                            </td>
-                            <td>
-                                <div class="company-name"><%= stock.name || 'N/A' %></div>
-                                <% if (stock.sector && stock.sector !== 'N/A') { %>
-                                    <div class="company-sector"><%= stock.sector %></div>
-                                <% } %>
-                            </td>
-                            <td class="price-column">
-                                $<%= (stock.lastPrice || 0).toFixed(2) %>
-                            </td>
-                            <td class="change-column <%= (stock.priceChange || 0) >= 0 ? 'price-up' : 'price-down' %>">
-                                <%= (stock.priceChange || 0) >= 0 ? '+' : '' %><%= Math.abs(stock.priceChange || 0).toFixed(2) %>%
-                            </td>
-                            <td class="actions-column">
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-success" 
-                                            onclick="showBuyModal('<%= stock.symbol %>')" 
-                                            data-bs-toggle="tooltip" 
-                                            title="Buy Stock">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-primary" 
-                                            onclick="viewStockDetails('<%= stock.symbol %>')" 
-                                            data-bs-toggle="tooltip" 
-                                            title="View Details">
-                                        <i class="fas fa-chart-line"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" 
-                                            onclick="removeFromWatchlist('<%= stock.symbol %>')" 
-                                            data-bs-toggle="tooltip" 
-                                            title="Remove">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
+                                    <p>Your watchlist is empty. Start by adding some stocks!</p>
                                 </div>
                             </td>
                         </tr>
-                    <% }); %>
+                    <% } %>
                 </tbody>
             </table>
         </div>
-
-        <% if (watchlist.length === 0) { %>
-            <div class="text-center py-5">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4>Your watchlist is empty</h4>
-                <p class="text-muted">Add stocks to start tracking their performance</p>
-                <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addStockModal">
-                    <i class="fas fa-plus"></i> Add Your First Stock
-                </button>
-            </div>
-        <% } %>
     </div>
 
     <!-- Add Stock Modal -->
@@ -228,160 +192,92 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="stockSymbol">Stock Symbol</label>
-                        <input type="text" class="form-control" id="stockSymbol" placeholder="e.g., AAPL">
-                        <small class="form-text text-muted">Enter the stock symbol (e.g., AAPL for Apple Inc.)</small>
+                    <div class="mb-3 position-relative">
+                        <label for="stockSearch" class="form-label">Search Stock</label>
+                        <input type="text" class="form-control" id="stockSearch" placeholder="Enter stock symbol or company name">
+                        <div id="searchResults" class="search-results d-none"></div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="addToWatchlist()">Add Stock</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Buy Stock Modal -->
-    <div class="modal fade" id="buyModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Buy Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <h6 id="buyStockSymbol" class="mb-1"></h6>
-                        <p id="buyStockName" class="text-muted mb-3"></p>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Current Price:</span>
-                            <span id="buyStockPrice" class="fw-bold"></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Available Balance:</span>
-                            <span id="userBalance" class="fw-bold"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="quantity">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" min="1" value="1">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" onclick="buyStock(document.getElementById('buyStockSymbol').textContent)">Confirm Purchase</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Trade Modal -->
+    <%- include('partials/trade-modal') %>
 
-    <%- include('partials/footer') %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Refresh watchlist with current prices
-        async function refreshWatchlist() {
-            try {
-                const response = await fetch('/watchlist/refresh', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    showAlert('Failed to refresh watchlist', 'danger');
-                }
-            } catch (error) {
-                showAlert('Error refreshing watchlist', 'danger');
-            }
-        }
+        let searchTimeout;
+        const searchInput = document.getElementById('stockSearch');
+        const searchResults = document.getElementById('searchResults');
 
-        // Filter stocks by type (all, gainers, losers)
-        function filterStocks(type) {
-            const rows = document.querySelectorAll('#watchlistBody tr');
+        // Real-time stock search
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
             
-            rows.forEach(row => {
-                const change = parseFloat(row.querySelector('td:nth-child(4)').textContent);
-                
-                switch(type) {
-                    case 'gainers':
-                        row.style.display = change >= 0 ? '' : 'none';
-                        break;
-                    case 'losers':
-                        row.style.display = change < 0 ? '' : 'none';
-                        break;
-                    default:
-                        row.style.display = '';
-                }
-            });
-
-            // Update active filter button
-            document.querySelectorAll('.filter-group .profile-action-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('.profile-action-btn').classList.add('active');
-        }
-
-        // Sort stocks by different criteria
-        function sortStocks(criteria) {
-            const tbody = document.getElementById('watchlistBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            
-            rows.sort((a, b) => {
-                let aVal, bVal;
-                
-                switch(criteria) {
-                    case 'symbol':
-                        aVal = a.querySelector('td:nth-child(1)').textContent;
-                        bVal = b.querySelector('td:nth-child(1)').textContent;
-                        return aVal.localeCompare(bVal);
-                    
-                    case 'price':
-                        aVal = parseFloat(a.querySelector('td:nth-child(3)').textContent.replace('$', ''));
-                        bVal = parseFloat(b.querySelector('td:nth-child(3)').textContent.replace('$', ''));
-                        return bVal - aVal;
-                    
-                    case 'change':
-                        aVal = parseFloat(a.querySelector('td:nth-child(4)').textContent);
-                        bVal = parseFloat(b.querySelector('td:nth-child(4)').textContent);
-                        return bVal - aVal;
-                }
-            });
-            
-            rows.forEach(row => tbody.appendChild(row));
-        }
-
-        // Add stock to watchlist
-        async function addToWatchlist() {
-            const symbolInput = document.getElementById('stockSymbol');
-            const symbol = symbolInput.value.trim().toUpperCase();
-            
-            if (!symbol) {
-                showAlert('Please enter a stock symbol', 'danger');
+            if (query.length < 2) {
+                searchResults.classList.add('d-none');
                 return;
             }
 
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/stock/search?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+
+                    if (data.success && data.results.length > 0) {
+                        searchResults.innerHTML = data.results.map(stock => `
+                            <div class="search-result-item" onclick="addToWatchlist('${stock.symbol}', '${stock.name}', '${stock.sector}')">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>${stock.symbol}</strong>
+                                        <div class="small text-muted">${stock.name}</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div>$${stock.price.toFixed(2)}</div>
+                                        <div class="small ${stock.change >= 0 ? 'text-success' : 'text-danger'}">
+                                            ${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                        searchResults.classList.remove('d-none');
+                    } else {
+                        searchResults.innerHTML = '<div class="p-3 text-muted">No results found</div>';
+                        searchResults.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    showAlert('Failed to search stocks', 'danger');
+                }
+            }, 300);
+        });
+
+        // Add stock to watchlist
+        async function addToWatchlist(symbol, name, sector) {
             try {
                 const response = await fetch('/watchlist/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ symbol })
+                    body: JSON.stringify({ symbol, name, sector })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
                 
-                if (result.success) {
+                if (data.success) {
+                    showAlert('Stock added to watchlist', 'success');
                     location.reload();
                 } else {
-                    showAlert(result.message || 'Failed to add stock', 'danger');
+                    showAlert(data.message || 'Failed to add stock', 'danger');
                 }
             } catch (error) {
-                showAlert('Error adding stock to watchlist', 'danger');
+                console.error('Add to watchlist error:', error);
+                showAlert('Failed to add stock to watchlist', 'danger');
             }
 
             // Close modal
@@ -404,111 +300,72 @@
                     body: JSON.stringify({ symbol })
                 });
 
-                const result = await response.json();
-                
-                if (result.success) {
-                    location.reload();
-                } else {
-                    showAlert(result.message || 'Failed to remove stock', 'danger');
-                }
-            } catch (error) {
-                showAlert('Error removing stock from watchlist', 'danger');
-            }
-        }
-
-        // View stock details
-        function viewStockDetails(symbol) {
-            window.location.href = `/stocks/${symbol}`;
-        }
-
-        // Buy stock functionality
-        function showBuyModal(symbol) {
-            // First get the latest price
-            fetch(`/watchlist/price/${symbol}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('buyStockSymbol').textContent = symbol;
-                        document.getElementById('buyStockName').textContent = data.name;
-                        document.getElementById('buyStockPrice').textContent = `$${data.price.toFixed(2)}`;
-                        
-                        // Get wallet balance from navbar
-                        const walletBalanceText = document.querySelector('.wallet-balance').textContent;
-                        const walletBalance = parseFloat(walletBalanceText.replace(/[^0-9.-]+/g, ''));
-                        document.getElementById('userBalance').textContent = `$${walletBalance.toFixed(2)}`;
-                        
-                        new bootstrap.Modal(document.getElementById('buyModal')).show();
-                    } else {
-                        console.error('Error fetching current price:', data);
-                        showAlert('Error fetching current price. Please try again.', 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching current price:', error);
-                    showAlert('Error fetching current price. Please try again.', 'danger');
-                });
-        }
-
-        async function buyStock(symbol) {
-            try {
-                // Get current price
-                const priceResponse = await fetch(`/watchlist/price/${symbol}`);
-                const priceData = await priceResponse.json();
-                
-                if (!priceData.success) {
-                    throw new Error('Failed to fetch current price');
-                }
-
-                const currentPrice = priceData.price;
-                const quantity = parseFloat(document.getElementById('quantity').value);
-                
-                if (!quantity || quantity <= 0) {
-                    alert('Please enter a valid quantity');
-                    return;
-                }
-
-                // Send buy request
-                const response = await fetch('/watchlist/buy', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        symbol,
-                        quantity,
-                        price: currentPrice
-                    })
-                });
-
                 const data = await response.json();
-
+                
                 if (data.success) {
-                    // Update wallet balance display
-                    const balanceElement = document.querySelector('.wallet-balance');
-                    if (balanceElement) {
-                        balanceElement.textContent = `$${data.order.newBalance.toFixed(2)}`;
-                    }
-
-                    // Show success message
-                    alert('Stock purchased successfully!');
+                    const row = document.getElementById(`stock-${symbol}`);
+                    row.remove();
+                    showAlert('Stock removed from watchlist', 'success');
                     
-                    // Close the modal
-                    const buyModal = bootstrap.Modal.getInstance(document.getElementById('buyModal'));
-                    buyModal.hide();
-
-                    // Refresh the page to update the watchlist
-                    location.reload();
+                    // If no stocks left, show empty state
+                    if (document.querySelectorAll('.watchlist-table tbody tr').length === 0) {
+                        document.querySelector('.watchlist-table tbody').innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
+                                        <p>Your watchlist is empty. Start by adding some stocks!</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }
                 } else {
-                    alert(data.message || 'Failed to purchase stock');
+                    showAlert(data.message || 'Failed to remove stock', 'danger');
                 }
             } catch (error) {
-                console.error('Error buying stock:', error);
-                alert('Failed to process purchase. Please try again.');
+                console.error('Remove from watchlist error:', error);
+                showAlert('Failed to remove stock from watchlist', 'danger');
             }
         }
+
+        // Refresh watchlist prices
+        async function refreshWatchlist() {
+            const refreshIcon = document.querySelector('.refresh-icon');
+            refreshIcon.classList.add('spinning');
+
+            try {
+                const response = await fetch('/watchlist/refresh');
+                const data = await response.json();
+                
+                if (data.success) {
+                    data.watchlist.forEach(stock => {
+                        const row = document.getElementById(`stock-${stock.symbol}`);
+                        if (row) {
+                            row.querySelector('.price-value').textContent = `$${stock.lastPrice.toFixed(2)}`;
+                            const changeElement = row.querySelector('.price-change');
+                            changeElement.textContent = `${stock.priceChange >= 0 ? '+' : ''}${stock.priceChange.toFixed(2)}%`;
+                            changeElement.className = `price-change ${stock.priceChange >= 0 ? 'positive' : 'negative'}`;
+                            row.querySelector('.last-updated').textContent = new Date(stock.lastUpdated).toLocaleString();
+                        }
+                    });
+                    showAlert('Prices updated successfully', 'success');
+                } else {
+                    showAlert(data.message || 'Failed to refresh prices', 'danger');
+                }
+            } catch (error) {
+                console.error('Refresh error:', error);
+                showAlert('Failed to refresh prices', 'danger');
+            }
+
+            refreshIcon.classList.remove('spinning');
+        }
+
+        // Auto-refresh prices every minute
+        setInterval(refreshWatchlist, 60000);
 
         // Show alert message
-        function showAlert(message, type, duration = 3000) {
+        function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
             alertDiv.style.zIndex = '9999';
@@ -517,11 +374,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             document.body.appendChild(alertDiv);
-
-            if (duration) {
-                setTimeout(() => alertDiv.remove(), duration);
-            }
+            setTimeout(() => alertDiv.remove(), 3000);
         }
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('d-none');
+            }
+        });
     </script>
 </body>
 </html>
