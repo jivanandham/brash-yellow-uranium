@@ -1,47 +1,56 @@
 /* Admin Forms Styles */
 body.admin-form {
   background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .form-container {
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin: 2rem auto;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .page-header {
   background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
   color: white;
-  padding: 2rem;
+  padding: 2.5rem;
   margin-bottom: 0;
 }
 
 .page-header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: 2.25rem;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  font-weight: 600;
 }
 
 .page-header p {
   margin-bottom: 0;
   opacity: 0.9;
+  font-size: 1.1rem;
+  max-width: 600px;
 }
 
 .form-card {
-  padding: 2rem;
+  padding: 2.5rem;
 }
 
 .form-section {
   background: #fff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  border-radius: 10px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
   border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .form-section:last-child {
@@ -49,71 +58,88 @@ body.admin-form {
 }
 
 .form-section-title {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #2c3e50;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
+  font-weight: 600;
 }
 
 .form-section-title i {
   color: #4a90e2;
+  font-size: 1.25rem;
 }
 
 .form-label {
   font-weight: 500;
   color: #2c3e50;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
 }
 
 .form-control {
   border: 2px solid #e9ecef;
-  border-radius: 6px;
-  padding: 0.75rem;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
 }
 
 .form-control:focus {
   border-color: #4a90e2;
-  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+  outline: none;
 }
 
 .form-note {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: #6c757d;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+.form-note i {
+  color: #4a90e2;
+}
+
 .role-option {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 1.25rem;
+  padding: 1.25rem;
   border: 2px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  background: #fff;
 }
 
 .role-option:hover {
   border-color: #4a90e2;
   background: #f8f9fa;
+  transform: translateY(-2px);
 }
 
 .role-option.selected {
   border-color: #4a90e2;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(74, 144, 226, 0.08);
 }
 
 .role-option i {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   color: #4a90e2;
-  width: 2rem;
+  width: 2.5rem;
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.role-option:hover i {
+  transform: scale(1.1);
 }
 
 .role-details {
@@ -121,72 +147,229 @@ body.admin-form {
 }
 
 .role-name {
-  font-weight: 500;
+  font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
 .role-description {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   color: #6c757d;
+  line-height: 1.4;
 }
 
 .form-actions {
   display: flex;
   gap: 1rem;
-  padding-top: 2rem;
+  padding-top: 2.5rem;
   border-top: 1px solid #e9ecef;
+  margin-top: 2rem;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-weight: 500;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  gap: 0.75rem;
+  padding: 0.875rem 1.75rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn i {
+  font-size: 1.1rem;
 }
 
 .btn-primary {
   background: #4a90e2;
   border-color: #4a90e2;
+  color: white;
 }
 
 .btn-primary:hover {
   background: #357abd;
   border-color: #357abd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
 }
 
 .btn-secondary {
   background: #6c757d;
   border-color: #6c757d;
+  color: white;
 }
 
 .btn-secondary:hover {
   background: #5a6268;
   border-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
 }
 
-@media (max-width: 768px) {
+/* Large Desktop (≥1400px) */
+@media (min-width: 1400px) {
+  .form-container {
+    max-width: 1300px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .form-section-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Desktop (≥1200px) */
+@media (min-width: 1200px) {
+  .form-container {
+    margin: 3rem auto;
+  }
+  
+  .form-card {
+    padding: 3rem;
+  }
+}
+
+/* Small Desktop/Laptop (≥992px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .form-container {
+    max-width: 960px;
+    margin: 2rem auto;
+  }
+}
+
+/* Tablet Landscape (≥768px and <992px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .form-container {
+    max-width: 720px;
+    margin: 1.5rem;
+  }
+  
+  .page-header {
+    padding: 2rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .form-card {
+    padding: 2rem;
+  }
+  
+  .form-section {
+    padding: 1.75rem;
+  }
+}
+
+/* Tablet Portrait (≥576px and <768px) */
+@media (min-width: 576px) and (max-width: 767px) {
   .form-container {
     margin: 1rem;
   }
   
   .page-header {
-    padding: 1.5rem;
+    padding: 1.75rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.75rem;
   }
   
   .form-card {
     padding: 1.5rem;
   }
   
+  .form-section {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-section-title {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  
   .form-actions {
     flex-direction: column;
+    gap: 0.75rem;
   }
   
   .btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Mobile (<576px) */
+@media (max-width: 575px) {
+  .form-container {
+    margin: 0.5rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .page-header p {
+    font-size: 0.95rem;
+  }
+  
+  .form-card {
+    padding: 1.25rem;
+  }
+  
+  .form-section {
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-section-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .role-option {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .role-option i {
+    font-size: 1.5rem;
+    width: 2rem;
+  }
+  
+  .role-name {
+    font-size: 1rem;
+  }
+  
+  .role-description {
+    font-size: 0.875rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+  
+  .form-note {
+    font-size: 0.85rem;
   }
 }
