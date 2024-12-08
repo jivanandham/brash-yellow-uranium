@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stocks - Trading Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/user-navbar') %>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Browse Stocks</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Change</th>
+                                        <th>Market Cap</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% stocks.forEach(stock => { %>
+                                        <tr>
+                                            <td><%= stock.symbol %></td>
+                                            <td><%= stock.name %></td>
+                                            <td>$<%= stock.price.toFixed(2) %></td>
+                                            <td class="<%= stock.change >= 0 ? 'text-success' : 'text-danger' %>">
+                                                <%= stock.change >= 0 ? '+' : '' %><%= stock.change.toFixed(2) %>%
+                                            </td>
+                                            <td><%= stock.marketCap %></td>
+                                            <td>
+                                                <button class="btn btn-success btn-sm buy-stock"
+                                                        data-symbol="<%= stock.symbol %>"
+                                                        data-name="<%= stock.name %>"
+                                                        data-price="<%= stock.price %>">
+                                                    <i class="fas fa-shopping-cart me-1"></i>Buy
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Stock Modal -->
+    <div class="modal fade" id="buyStockModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buy Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="buyStockForm">
+                        <div class="mb-3">
+                            <label class="form-label">Stock</label>
+                            <input type="text" class="form-control" id="stockName" readonly>
+                            <input type="hidden" id="stockSymbol">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" id="stockPrice" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Total Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" id="totalAmount" readonly>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger d-none" id="buyError"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmBuy">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const buyModal = new bootstrap.Modal(document.getElementById('buyStockModal'));
+            const buyForm = document.getElementById('buyStockForm');
+            const quantityInput = document.getElementById('quantity');
+            const totalAmountInput = document.getElementById('totalAmount');
+            const buyError = document.getElementById('buyError');
+
+            // Handle buy button clicks
+            document.querySelectorAll('.buy-stock').forEach(button => {
+                button.addEventListener('click', function() {
+                    const symbol = this.dataset.symbol;
+                    const name = this.dataset.name;
+                    const price = parseFloat(this.dataset.price);
+
+                    document.getElementById('stockSymbol').value = symbol;
+                    document.getElementById('stockName').value = name;
+                    document.getElementById('stockPrice').value = price.toFixed(2);
+                    quantityInput.value = '1';
+                    updateTotal();
+                    buyError.classList.add('d-none');
+                    buyModal.show();
+                });
+            });
+
+            // Update total amount when quantity changes
+            quantityInput.addEventListener('input', updateTotal);
+
+            function updateTotal() {
+                const price = parseFloat(document.getElementById('stockPrice').value);
+                const quantity = parseInt(quantityInput.value) || 0;
+                totalAmountInput.value = (price * quantity).toFixed(2);
+            }
+
+            // Handle buy confirmation
+            document.getElementById('confirmBuy').addEventListener('click', async function() {
+                const symbol = document.getElementById('stockSymbol').value;
+                const quantity = parseInt(quantityInput.value);
+
+                if (!quantity || quantity < 1) {
+                    buyError.textContent = 'Please enter a valid quantity';
+                    buyError.classList.remove('d-none');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/orders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            symbol,
+                            quantity,
+                            type: 'buy'
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        buyModal.hide();
+                        alert('Stock purchased successfully!');
+                        window.location.href = '/portfolio';
+                    } else {
+                        buyError.textContent = data.message || 'Failed to purchase stock';
+                        buyError.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    buyError.textContent = 'An error occurred while processing your request';
+                    buyError.classList.remove('d-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+/* Security Dashboard Styles */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --success-color: #48bb78;
+    --warning-color: #f6ad55;
+    --danger-color: #f56565;
+    --info-color: #4299e1;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Main Container */
+.security-dashboard {
+    padding: 2rem;
+    background: var(--secondary-gradient);
+    min-height: calc(100vh - 60px);
+}
+
+/* Header Section */
+.security-header {
+    background: var(--primary-gradient);
+    border-radius: 1rem;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.security-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+    transform: skewX(-30deg);
+}
+
+/* Stats Cards */
+.stat-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.stat-title {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Severity Indicators */
+.severity-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.severity-high {
+    background-color: #FED7D7;
+    color: #C53030;
+}
+
+.severity-medium {
+    background-color: #FEEBC8;
+    color: #C05621;
+}
+
+.severity-low {
+    background-color: #E6FFFA;
+    color: #2C7A7B;
+}
+
+/* Security Alerts */
+.security-alerts {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.alert-item {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+    background: #F7FAFC;
+    transition: all 0.2s ease;
+}
+
+.alert-item:hover {
+    transform: translateX(5px);
+}
+
+.alert-item.high {
+    border-left-color: var(--danger-color);
+}
+
+.alert-item.medium {
+    border-left-color: var(--warning-color);
+}
+
+.alert-item.low {
+    border-left-color: var(--info-color);
+}
+
+/* Audit Logs */
+.audit-log-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.log-entry {
+    padding: 1rem;
+    border-bottom: 1px solid #E2E8F0;
+    transition: background-color 0.2s ease;
+}
+
+.log-entry:hover {
+    background-color: #F7FAFC;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+/* Filter Section */
+.filter-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.filter-section .form-control,
+.filter-section .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #E2E8F0;
+    padding: 0.75rem 1rem;
+}
+
+.filter-section .form-control:focus,
+.filter-section .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Charts */
+.chart-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .security-dashboard {
+        padding: 1rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .security-header {
+        padding: 1.5rem;
+    }
+}
+
+/* Custom Scrollbar */
+.audit-log-container {
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E0 #EDF2F7;
+}
+
+.audit-log-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.audit-log-container::-webkit-scrollbar-track {
+    background: #EDF2F7;
+}
+
+.audit-log-container::-webkit-scrollbar-thumb {
+    background-color: #CBD5E0;
+    border-radius: 3px;
+}
