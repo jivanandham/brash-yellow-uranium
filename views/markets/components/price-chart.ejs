@@ -1,0 +1,70 @@
+<div class="price-chart-container">
+    <div class="chart-header">
+        <h3><%= symbol %> Price Chart</h3>
+        <div class="chart-controls">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary" data-timeframe="1D">1D</button>
+                <button type="button" class="btn btn-outline-secondary" data-timeframe="1W">1W</button>
+                <button type="button" class="btn btn-outline-secondary" data-timeframe="1M">1M</button>
+                <button type="button" class="btn btn-outline-secondary" data-timeframe="3M">3M</button>
+                <button type="button" class="btn btn-outline-secondary" data-timeframe="1Y">1Y</button>
+                <button type="button" class="btn btn-outline-secondary" data-timeframe="ALL">ALL</button>
+            </div>
+            <div class="chart-type-selector">
+                <button class="btn btn-outline-secondary" data-chart-type="line">
+                    <i class="fas fa-chart-line"></i>
+                </button>
+                <button class="btn btn-outline-secondary" data-chart-type="candle">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <canvas id="priceChart"></canvas>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    let chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: <%= JSON.stringify(timeLabels) %>,
+            datasets: [{
+                label: '<%= symbol %> Price',
+                data: <%= JSON.stringify(priceData) %>,
+                borderColor: '#2196F3',
+                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>

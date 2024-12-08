@@ -1,0 +1,130 @@
+<%- include('../layout/market-layout', {
+    title: 'Market Overview',
+    icon: 'chart-pie',
+    stylesheets: '',
+    scripts: ''
+}) %>
+
+<div class="market-overview">
+    <div class="row">
+        <!-- Market Summary -->
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Market Summary</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="market-metric">
+                                <span class="metric-label">Global Market Cap</span>
+                                <span class="metric-value">$92.4T</span>
+                                <span class="metric-change positive">+2.3%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="market-metric">
+                                <span class="metric-label">24h Volume</span>
+                                <span class="metric-value">$4.2T</span>
+                                <span class="metric-change negative">-1.5%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="market-metric">
+                                <span class="metric-label">Active Markets</span>
+                                <span class="metric-value">6</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="market-metric">
+                                <span class="metric-label">Total Assets</span>
+                                <span class="metric-value">12,453</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="/markets/instruments/stocks" class="quick-action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Stocks</span>
+                        </a>
+                        <a href="/markets/instruments/etfs" class="quick-action-btn">
+                            <i class="fas fa-layer-group"></i>
+                            <span>ETFs</span>
+                        </a>
+                        <a href="/markets/instruments/commodities" class="quick-action-btn">
+                            <i class="fas fa-box"></i>
+                            <span>Commodities</span>
+                        </a>
+                        <a href="/markets/instruments/currencies" class="quick-action-btn">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Currencies</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Performance -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Market Performance</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Market</th>
+                                    <th>Market Cap</th>
+                                    <th>24h Volume</th>
+                                    <th>Assets</th>
+                                    <th>24h Change</th>
+                                    <th>7d Change</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% markets.forEach(market => { %>
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-<%= market.icon %>"></i>
+                                        <%= market.name %>
+                                    </td>
+                                    <td><%= market.marketCap %></td>
+                                    <td><%= market.volume24h %></td>
+                                    <td><%= market.assets %></td>
+                                    <td class="<%= market.change24h >= 0 ? 'positive' : 'negative' %>">
+                                        <%= market.change24h %>%
+                                    </td>
+                                    <td class="<%= market.change7d >= 0 ? 'positive' : 'negative' %>">
+                                        <%= market.change7d %>%
+                                    </td>
+                                    <td>
+                                        <a href="/markets/instruments/<%= market.path %>" class="btn btn-sm btn-primary">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

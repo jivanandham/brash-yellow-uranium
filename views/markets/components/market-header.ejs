@@ -1,0 +1,30 @@
+<div class="market-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1><i class="fas fa-<%= icon %>"></i> <%= title %></h1>
+        <div class="market-actions">
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#sortModal">
+                <i class="fas fa-sort"></i> Sort
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tradeModal">
+                <i class="fas fa-exchange-alt"></i> Trade
+            </button>
+        </div>
+    </div>
+    <div class="market-stats mt-3">
+        <div class="stat-item">
+            <span class="stat-label">Market Cap</span>
+            <span class="stat-value"><%= marketCap %></span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">24h Volume</span>
+            <span class="stat-value"><%= volume24h %></span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Active Assets</span>
+            <span class="stat-value"><%= activeAssets %></span>
+        </div>
+    </div>
+</div>
