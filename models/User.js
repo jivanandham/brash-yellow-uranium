@@ -1,18 +1,22 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const UserSchema = new mongoose.Schema({
   _id: { 
     type: String,
-    required: true
+    default: () => uuidv4()
   },
   name: { 
     type: String, 
-    required: true 
+    required: true,
+    trim: true
   },
   email: { 
     type: String, 
-    required: true, 
-    unique: true 
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
   },
   picture: { 
     type: String 
@@ -24,13 +28,20 @@ const UserSchema = new mongoose.Schema({
   },
   walletBalance: { 
     type: Number, 
-    default: 0 
+    default: 50000 
   },
   bio: { 
-    type: String 
+    type: String,
+    trim: true
   },
   contactNumber: { 
-    type: String 
+    type: String,
+    trim: true
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'suspended'],
+    default: 'active'
   },
   watchlist: [{
     symbol: { 
@@ -53,4 +64,6 @@ const UserSchema = new mongoose.Schema({
 // Create indexes
 UserSchema.index({ email: 1 }, { unique: true });
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
+
+module.exports = User;

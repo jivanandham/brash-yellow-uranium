@@ -11,12 +11,20 @@
   <link rel="stylesheet" href="/css/navbar.css">
   <link rel="stylesheet" href="/css/user-navbar.css">
   <link rel="stylesheet" href="/css/profile.css">
+  <link rel="stylesheet" href="/css/dashboard-header.css">
 </head>
 <body>
   <%- include('partials/navbar') %>
   <%- include('partials/user-navbar') %>
-  
-  <div class="profile-container">
+
+  <%- include('partials/dashboard-header', {
+      title: 'Edit Profile',
+      description: 'Update your account information',
+      showBalance: false,
+      actionButton: '<a href="/profile" class="btn btn-light"><i class="bi bi-arrow-left"></i> Back to Profile</a>'
+  }) %>
+
+  <div class="container mt-4">
     <% if (messages && messages.error && messages.error.length > 0) { %>
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <%= messages.error[0] %>

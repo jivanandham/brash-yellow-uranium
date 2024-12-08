@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Admin Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/admin-navbar.css">
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="dashboard-card" data-aos="fade-up">
+          <div class="card-header">
+            <i class="fas fa-user-edit"></i>
+            <span class="badge bg-primary">Edit Profile</span>
+          </div>
+          <h3>Edit Your Profile</h3>
+          
+          <form id="profileEditForm" class="mt-4">
+            <!-- Profile Picture -->
+            <div class="text-center mb-4">
+              <div class="profile-picture-container">
+                <img src="<%= user.profilePicture || '/images/default-avatar.png' %>" alt="Profile Picture" class="profile-picture">
+                <div class="picture-overlay">
+                  <label for="profilePicture" class="picture-edit-btn">
+                    <i class="fas fa-camera"></i>
+                  </label>
+                  <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="d-none">
+                </div>
+              </div>
+              <small class="text-muted mt-2 d-block">Click to change profile picture</small>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="section-title">
+              <i class="fas fa-user"></i>
+              Personal Information
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Full Name</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="text" class="form-control" name="name" value="<%= user.name %>" required>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Email</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                <input type="email" class="form-control" value="<%= user.email %>" readonly>
+              </div>
+              <small class="text-muted">Email cannot be changed</small>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Bio</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                <textarea class="form-control" name="bio" rows="3" placeholder="Tell us about yourself"><%= user.bio || '' %></textarea>
+              </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="section-title">
+              <i class="fas fa-address-card"></i>
+              Contact Information
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Phone Number</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                <input type="tel" class="form-control" name="contactNumber" value="<%= user.contactNumber || '' %>" placeholder="Enter your phone number">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Location</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                <input type="text" class="form-control" name="location" value="<%= user.location || '' %>" placeholder="Enter your location">
+              </div>
+            </div>
+
+            <!-- Preferences -->
+            <div class="section-title">
+              <i class="fas fa-cog"></i>
+              Preferences
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Notification Preferences</label>
+              <div class="preference-options">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="emailNotifications" id="emailNotifications" <%= user.preferences?.emailNotifications ? 'checked' : '' %>>
+                  <label class="form-check-label" for="emailNotifications">
+                    Email Notifications
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="smsNotifications" id="smsNotifications" <%= user.preferences?.smsNotifications ? 'checked' : '' %>>
+                  <label class="form-check-label" for="smsNotifications">
+                    SMS Notifications
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="action-btn primary">
+                <i class="fas fa-save"></i>
+                Save Changes
+              </button>
+              <a href="/admin/profile" class="action-btn secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      once: true
+    });
+
+    // Profile Picture Preview
+    document.getElementById('profilePicture').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.querySelector('.profile-picture').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Form Submission
+    document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        // Handle profile picture upload first if changed
+        const profilePicture = formData.get('profilePicture');
+        if (profilePicture.size > 0) {
+          const pictureFormData = new FormData();
+          pictureFormData.append('profilePicture', profilePicture);
+          
+          await fetch('/admin/profile/upload-picture', {
+            method: 'POST',
+            body: pictureFormData
+          });
+        }
+
+        // Handle other profile data
+        const response = await fetch('/admin/profile/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: formData.get('name'),
+            bio: formData.get('bio'),
+            contactNumber: formData.get('contactNumber'),
+            location: formData.get('location'),
+            preferences: {
+              emailNotifications: formData.get('emailNotifications') === 'on',
+              smsNotifications: formData.get('smsNotifications') === 'on'
+            }
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showAlert('success', 'Profile updated successfully');
+          setTimeout(() => {
+            window.location.href = '/admin/profile';
+          }, 1500);
+        } else {
+          showAlert('error', data.message || 'Failed to update profile');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showAlert('error', 'Failed to update profile');
+      }
+    });
+
+    // Alert function
+    function showAlert(type, message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      document.body.appendChild(alertDiv);
+      setTimeout(() => alertDiv.remove(), 5000);
+    }
+  </script>
+</body>
+</html>

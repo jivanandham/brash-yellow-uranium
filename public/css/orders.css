@@ -1,12 +1,32 @@
+.dashboard-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #212529;
+}
+
+.dashboard-header p {
+    color: #6c757d;
+    font-size: 1rem;
+}
+
 .orders-container {
     padding: 20px;
 }
 
 .balance-display {
-    background-color: #f8f9fa;
+    display: inline-block;
+    background-color: #ffffff;
     padding: 10px 15px;
     border-radius: 8px;
     border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .balance-display i {

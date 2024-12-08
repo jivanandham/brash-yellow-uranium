@@ -60,7 +60,7 @@ const createAuditLog = async (userId, action, description, eventType, severity, 
 };
 
 // Admin Dashboard Route
-router.get(['/admin-dashboard', '/admin/dashboard'], isAdmin, async (req, res) => {
+router.get(['/', '/dashboard'], isAdmin, async (req, res) => {
   try {
     // Debug: Log the current user
     console.log('Current user:', req.oidc.user);
@@ -77,6 +77,17 @@ router.get(['/admin-dashboard', '/admin/dashboard'], isAdmin, async (req, res) =
       });
       await adminUser.save();
       console.log('Created new admin user:', adminUser);
+      
+      // Create success notification
+      await createNotification(
+        req.oidc.user.sub,
+        'User Created',
+        'Your admin account has been successfully created',
+        'success'
+      );
+      
+      // Redirect to users page after creation
+      return res.redirect('/admin/users');
     } else if (adminUser.role !== 'admin') {
       // Ensure the user has admin role
       adminUser.role = 'admin';
@@ -116,7 +127,7 @@ router.get(['/admin-dashboard', '/admin/dashboard'], isAdmin, async (req, res) =
         monthlyGrowthRate
       });
 
-      res.render('admin-dashboard', { 
+      res.render('admin/admin-dashboard', { 
         user: req.oidc.user,
         totalUsers,
         totalTransactions,
@@ -135,7 +146,7 @@ router.get(['/admin-dashboard', '/admin/dashboard'], isAdmin, async (req, res) =
 });
 
 // Admin User Management Page
-router.get('/admin/users', isAdmin, async (req, res) => {
+router.get('/users', isAdmin, async (req, res) => {
   try {
     const users = await User.find();
     res.render('admin/users', { users });
@@ -146,12 +157,12 @@ router.get('/admin/users', isAdmin, async (req, res) => {
 });
 
 // Serve Add User Form
-router.get('/admin/add-user', (req, res) => {
+router.get('/add-user', (req, res) => {
   res.render('admin/add-user'); // Ensure the view file is located at views/admin/add-user.ejs
 });
 
 // Add User Route
-router.post('/admin/add-user', isAdmin, async (req, res) => {
+router.post('/add-user', isAdmin, async (req, res) => {
   try {
     const { name, email, role } = req.body;
 
@@ -183,7 +194,7 @@ router.post('/admin/add-user', isAdmin, async (req, res) => {
       'success'
     );
 
-    res.redirect('/admin/users'); // Redirect to the user list page
+    res.redirect('/admin/users'); // Redirect to the admin user list page
   } catch (error) {
     console.error('Error adding user:', error);
     
@@ -200,7 +211,7 @@ router.post('/admin/add-user', isAdmin, async (req, res) => {
 });
 
 // Manage Roles Route
-router.get('/admin/manage-roles', async (req, res) => {
+router.get('/manage-roles', async (req, res) => {
   try {
     const users = await User.find(); // Fetch all users from the database
     res.render('admin/manage-roles', { users }); // Render the view with users data
@@ -211,7 +222,7 @@ router.get('/admin/manage-roles', async (req, res) => {
 });
 
 // Edit a user profile (GET form)
-router.get('/admin/users/:id/edit', isAdmin, async (req, res) => {
+router.get('/users/:id/edit', isAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -230,7 +241,7 @@ router.get('/edit-user', (req, res) => {
 });
 
 // Update user profile (POST form)
-router.post('/admin/users/:id/edit', isAdmin, async (req, res) => {
+router.post('/users/:id/edit', isAdmin, async (req, res) => {
   try {
     const { name, role } = req.body;
     await User.findByIdAndUpdate(req.params.id, { name, role });
@@ -243,7 +254,7 @@ router.post('/admin/users/:id/edit', isAdmin, async (req, res) => {
       'success'
     );
 
-    res.redirect('/admin/users');
+    res.redirect('/users');
   } catch (err) {
     console.error('Error updating user:', err);
     
@@ -260,7 +271,7 @@ router.post('/admin/users/:id/edit', isAdmin, async (req, res) => {
 });
 
 // View transactions by user
-router.get('/admin/users/:id/transactions', isAdmin, async (req, res) => {
+router.get('/users/:id/transactions', isAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -276,7 +287,7 @@ router.get('/admin/users/:id/transactions', isAdmin, async (req, res) => {
 });
 
 // View active sessions (assuming sessions are stored in MongoDB)
-router.get('/admin/users/:id/sessions', isAdmin, async (req, res) => {
+router.get('/users/:id/sessions', isAdmin, async (req, res) => {
   const sessionCollection = mongoose.connection.collection('sessions');
   try {
     const user = await User.findById(req.params.id);
@@ -298,7 +309,7 @@ router.get('/admin/users/:id/sessions', isAdmin, async (req, res) => {
 });
 
 // Display Manage Roles Page
-router.get('/admin/users/roles', isAdmin, async (req, res) => {
+router.get('/users/roles', isAdmin, async (req, res) => {
   try {
     const users = await User.find();
     res.render('admin/manage-roles', { users });
@@ -309,7 +320,7 @@ router.get('/admin/users/roles', isAdmin, async (req, res) => {
 });
 
 // Update User Role
-router.post('/admin/users/roles/update', isAdmin, async (req, res) => {
+router.post('/users/roles/update', isAdmin, async (req, res) => {
   const { userId, role } = req.body;
 
   try {
@@ -323,7 +334,7 @@ router.post('/admin/users/roles/update', isAdmin, async (req, res) => {
       'success'
     );
 
-    res.redirect('/admin/users/roles'); // Redirect to the role management page
+    res.redirect('/users/roles'); // Redirect to the role management page
   } catch (err) {
     console.error('Error updating user role:', err);
     
@@ -340,7 +351,7 @@ router.post('/admin/users/roles/update', isAdmin, async (req, res) => {
 });
 
 // Admin Settings Routes
-router.get('/admin/settings', isAdmin, async (req, res) => {
+router.get('/settings', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
 
@@ -373,7 +384,7 @@ router.get('/admin/settings', isAdmin, async (req, res) => {
 });
 
 // Update settings
-router.post('/admin/settings', isAdmin, async (req, res) => {
+router.post('/settings', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
     const { notifications, security, display } = req.body;
@@ -396,7 +407,7 @@ router.post('/admin/settings', isAdmin, async (req, res) => {
 });
 
 // Get all notifications
-router.get('/admin/notifications', isAdmin, async (req, res) => {
+router.get('/notifications', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
     const page = parseInt(req.query.page) || 1;
@@ -425,7 +436,7 @@ router.get('/admin/notifications', isAdmin, async (req, res) => {
 });
 
 // Mark notification as read
-router.post('/admin/notifications/:id/read', isAdmin, async (req, res) => {
+router.post('/notifications/:id/read', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
     const notification = await Notification.findOneAndUpdate(
@@ -446,7 +457,7 @@ router.post('/admin/notifications/:id/read', isAdmin, async (req, res) => {
 });
 
 // Delete notification
-router.delete('/admin/notifications/:id', isAdmin, async (req, res) => {
+router.delete('/notifications/:id', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
     const notification = await Notification.findOneAndDelete({
@@ -466,7 +477,7 @@ router.delete('/admin/notifications/:id', isAdmin, async (req, res) => {
 });
 
 // Add a route to get unread notification count
-router.get('/admin/notifications/unread-count', isAdmin, async (req, res) => {
+router.get('/notifications/unread-count', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
     const count = await Notification.countDocuments({ userId, read: false });
@@ -478,7 +489,7 @@ router.get('/admin/notifications/unread-count', isAdmin, async (req, res) => {
 });
 
 // Add a route to mark all notifications as read
-router.post('/admin/notifications/mark-all-read', isAdmin, async (req, res) => {
+router.post('/notifications/mark-all-read', isAdmin, async (req, res) => {
   try {
     const userId = req.oidc.user.sub;
     await Notification.updateMany(
@@ -493,17 +504,38 @@ router.post('/admin/notifications/mark-all-read', isAdmin, async (req, res) => {
 });
 
 // Reports Route (Placeholder)
-router.get('/admin/reports/:type', isAdmin, (req, res) => {
+router.get('/reports/:type', isAdmin, (req, res) => {
   const reportType = req.params.type;
   res.send(`Viewing ${reportType} reports`);
 });
 
-router.get('/admin/error-logs', isAdmin, async (req, res) => {
+router.get('/error-logs', isAdmin, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const totalLogs = await ErrorLog.countDocuments();
+    const totalPages = Math.ceil(totalLogs / limit);
+
+    // Get paginated error logs
     const errorLogs = await ErrorLog.find()
-      .populate('userId', 'name email') // Populate user details
-      .sort({ timestamp: -1 }); // Sort by most recent
-    res.render('admin/error-logs', { errorLogs, user: req.oidc.user }); // Pass the user object
+      .populate('userId', 'name email')
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.render('admin/error-logs', {
+      errorLogs,
+      user: req.oidc.user,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
   } catch (err) {
     console.error('Error fetching error logs:', err);
     res.status(500).send('Internal Server Error');
@@ -584,7 +616,7 @@ router.get('/user-transactions', isAdmin, async (req, res) => {
 });
 
 // View all user transactions
-router.get('/admin/user-transactions', isAdmin, async (req, res) => {
+router.get('/user-transactions', isAdmin, async (req, res) => {
   try {
     // Get query parameters for filtering
     const { startDate, endDate, type, user } = req.query;
@@ -656,7 +688,7 @@ router.get('/admin/user-transactions', isAdmin, async (req, res) => {
 });
 
 // Notifications Routes
-router.get('/admin/settings/notifications', isAdmin, async (req, res) => {
+router.get('/settings/notifications', isAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
@@ -690,7 +722,7 @@ router.get('/admin/settings/notifications', isAdmin, async (req, res) => {
 });
 
 // Mark notification as read
-router.post('/admin/notifications/:id/read', isAdmin, async (req, res) => {
+router.post('/notifications/:id/read', isAdmin, async (req, res) => {
   try {
     const notification = await Notification.findOneAndUpdate(
       { _id: req.params.id, userId: req.oidc.user.sub },
@@ -710,7 +742,7 @@ router.post('/admin/notifications/:id/read', isAdmin, async (req, res) => {
 });
 
 // Delete notification
-router.delete('/admin/notifications/:id', isAdmin, async (req, res) => {
+router.delete('/notifications/:id', isAdmin, async (req, res) => {
   try {
     const notification = await Notification.findOneAndDelete({
       _id: req.params.id,
@@ -729,7 +761,7 @@ router.delete('/admin/notifications/:id', isAdmin, async (req, res) => {
 });
 
 // Mark all notifications as read
-router.post('/admin/notifications/mark-all-read', isAdmin, async (req, res) => {
+router.post('/notifications/mark-all-read', isAdmin, async (req, res) => {
   try {
     await Notification.updateMany(
       { userId: req.oidc.user.sub, read: false },
@@ -744,7 +776,7 @@ router.post('/admin/notifications/mark-all-read', isAdmin, async (req, res) => {
 });
 
 // Security Dashboard Route
-router.get('/admin/security', isAdmin, async (req, res) => {
+router.get('/security', isAdmin, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
@@ -818,7 +850,7 @@ router.get('/admin/security', isAdmin, async (req, res) => {
 
         res.render('admin/security-dashboard', {
             user: req.oidc.user,
-            path: '/admin/security',
+            path: '/security',
             auditLogs: auditLogs || [],
             currentPage: page,
             totalPages: Math.ceil(totalLogs / limit),
@@ -834,7 +866,7 @@ router.get('/admin/security', isAdmin, async (req, res) => {
         console.error('Error in security dashboard:', error);
         res.status(500).render('error', {
             user: req.oidc.user,
-            path: '/admin/security',
+            path: '/security',
             error: {
                 message: 'Failed to load security dashboard',
                 details: error.message
@@ -844,7 +876,7 @@ router.get('/admin/security', isAdmin, async (req, res) => {
 });
 
 // Audit Logs Route
-router.get('/admin/audit-logs', isAdmin, async (req, res) => {
+router.get('/audit-logs', isAdmin, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 10;
@@ -874,6 +906,144 @@ router.get('/admin/audit-logs', isAdmin, async (req, res) => {
             error: 'Failed to fetch audit logs'
         });
     }
+});
+
+// Admin Profile Route
+router.get('/profile', isAdmin, async (req, res) => {
+  try {
+    const admin = await User.findOne({ email: req.oidc.user.email });
+    if (!admin) {
+      return res.status(404).send('Admin not found');
+    }
+
+    // Get admin stats
+    const totalUsers = await User.countDocuments();
+    const totalTransactions = await Transaction.countDocuments();
+    const activeAdmins = await User.countDocuments({ role: 'admin' });
+
+    // Calculate growth rate
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentUsers = await User.countDocuments({
+      createdAt: { $gte: thirtyDaysAgo }
+    });
+    const growthRate = totalUsers === 0 ? 0 : Math.round((recentUsers / totalUsers) * 100);
+
+    res.render('admin/profile', {
+      user: admin,
+      stats: {
+        totalUsers,
+        totalTransactions,
+        activeAdmins,
+        growthRate
+      },
+      isAuthenticated: true
+    });
+  } catch (error) {
+    console.error('Error loading admin profile:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Admin Profile Edit Route
+router.get('/profile/edit', isAdmin, async (req, res) => {
+  try {
+    const admin = await User.findOne({ email: req.oidc.user.email });
+    if (!admin) {
+      return res.status(404).send('Admin not found');
+    }
+
+    res.render('admin/profile-edit', {
+      user: admin,
+      isAuthenticated: true
+    });
+  } catch (error) {
+    console.error('Error loading admin profile edit:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Update Admin Profile
+router.post('/profile/update', isAdmin, async (req, res) => {
+  try {
+    const { name, bio, contactNumber } = req.body;
+    const admin = await User.findOneAndUpdate(
+      { email: req.oidc.user.email },
+      {
+        $set: {
+          name: name || req.oidc.user.name,
+          bio,
+          contactNumber,
+          updatedAt: new Date()
+        }
+      },
+      { new: true }
+    );
+
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+
+    // Create audit log
+    await createAuditLog(
+      admin._id,
+      'profile_update',
+      'Admin profile updated',
+      'user_management',
+      'info',
+      req
+    );
+
+    res.json({ success: true, message: 'Profile updated successfully', user: admin });
+  } catch (error) {
+    console.error('Error updating admin profile:', error);
+    res.status(500).json({ success: false, message: 'Failed to update profile' });
+  }
+});
+
+// Change Admin Password
+router.post('/profile/change-password', isAdmin, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const admin = await User.findOne({ email: req.oidc.user.email });
+
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+
+    // Verify current password (implement your password verification logic here)
+    const isValidPassword = await admin.comparePassword(currentPassword);
+    if (!isValidPassword) {
+      return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    // Update password
+    admin.password = newPassword;
+    await admin.save();
+
+    // Create audit log
+    await createAuditLog(
+      admin._id,
+      'password_change',
+      'Admin password changed',
+      'security',
+      'high',
+      req
+    );
+
+    // Create notification
+    await createNotification(
+      admin._id,
+      'Password Changed',
+      'Your admin password has been successfully updated.',
+      'success'
+    );
+
+    res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error changing admin password:', error);
+    res.status(500).json({ success: false, message: 'Failed to change password' });
+  }
 });
 
 module.exports = router;

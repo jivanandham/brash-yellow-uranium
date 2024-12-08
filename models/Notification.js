@@ -8,7 +8,7 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['alert', 'order', 'system', 'price', 'news'],
+        enum: ['alert', 'order', 'system', 'info', 'success', 'warning', 'error'],
         required: true
     },
     title: {
@@ -18,6 +18,10 @@ const notificationSchema = new mongoose.Schema({
     message: {
         type: String,
         required: true
+    },
+    icon: {
+        type: String,
+        default: 'fas fa-bell'
     },
     priority: {
         type: String,
@@ -29,17 +33,13 @@ const notificationSchema = new mongoose.Schema({
         enum: ['unread', 'read', 'archived'],
         default: 'unread'
     },
-    link: {
-        type: String
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
-    metadata: {
-        symbol: String,
-        price: Number,
-        orderId: String,
-        alertId: String
-    },
-    expiresAt: {
-        type: Date
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 }, {
     timestamps: true
@@ -49,63 +49,45 @@ const notificationSchema = new mongoose.Schema({
 notificationSchema.index({ userId: 1, status: 1, createdAt: -1 });
 
 // Method to mark notification as read
-notificationSchema.methods.markAsRead = function() {
+notificationSchema.methods.markAsRead = async function() {
     this.status = 'read';
-    return this.save();
+    this.updatedAt = new Date();
+    return await this.save();
 };
 
 // Method to archive notification
-notificationSchema.methods.archive = function() {
+notificationSchema.methods.archive = async function() {
     this.status = 'archived';
-    return this.save();
+    this.updatedAt = new Date();
+    return await this.save();
 };
 
-// Static method to create a price alert notification
-notificationSchema.statics.createPriceAlert = async function(userId, symbol, price, alertType, message) {
-    return this.create({
+// Static method to create a notification
+notificationSchema.statics.createNotification = async function(userId, title, message, type = 'info', priority = 'medium') {
+    const notification = new this({
         userId,
-        type: 'price',
-        title: `Price Alert: ${symbol}`,
-        message,
-        priority: 'high',
-        metadata: {
-            symbol,
-            price
-        },
-        link: '/orders'
-    });
-};
-
-// Static method to create an order notification
-notificationSchema.statics.createOrderNotification = async function(userId, orderId, status, symbol, quantity, price) {
-    const title = `Order ${status.charAt(0).toUpperCase() + status.slice(1)}`;
-    const message = `Your order for ${quantity} shares of ${symbol} at $${price} has been ${status}.`;
-    
-    return this.create({
-        userId,
-        type: 'order',
         title,
         message,
-        priority: 'high',
-        metadata: {
-            orderId,
-            symbol,
-            price
-        },
-        link: '/orders'
+        type,
+        priority,
+        icon: getIconForType(type)
     });
+    return await notification.save();
 };
 
-// Static method to create a system notification
-notificationSchema.statics.createSystemNotification = async function(userId, title, message, priority = 'medium') {
-    return this.create({
-        userId,
-        type: 'system',
-        title,
-        message,
-        priority
-    });
-};
+// Helper function to get icon based on notification type
+function getIconForType(type) {
+    const icons = {
+        info: 'fas fa-info-circle',
+        success: 'fas fa-check-circle',
+        warning: 'fas fa-exclamation-triangle',
+        error: 'fas fa-times-circle',
+        alert: 'fas fa-bell',
+        order: 'fas fa-shopping-cart',
+        system: 'fas fa-cog'
+    };
+    return icons[type] || icons.info;
+}
 
 const Notification = mongoose.model('Notification', notificationSchema);
 

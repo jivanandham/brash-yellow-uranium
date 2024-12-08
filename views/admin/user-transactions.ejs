@@ -6,390 +6,424 @@
   <title>User Transactions - Admin Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
   <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    .transactions-page {
+      background-color: #f8f9fa;
       min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      padding: 2rem 0;
     }
 
-    .container {
-      padding: 2rem 1rem;
-      max-width: 1400px;
-    }
-
-    .page-header {
-      margin-bottom: 2rem;
-      color: #2d3748;
-    }
-
-    .page-header h1 {
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .page-header p {
-      color: #718096;
-      font-size: 1.1rem;
-      margin-bottom: 0;
-    }
-
-    .stats-container {
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
 
     .stat-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 15px;
+      background: white;
+      border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      text-align: center;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
     }
 
-    .stat-card i {
-      font-size: 2rem;
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 1rem;
-      color: #667eea;
     }
 
-    .stat-card .stat-value {
-      font-size: 1.8rem;
+    .stat-icon.purple {
+      background: rgba(149, 76, 233, 0.1);
+      color: #954ce9;
+    }
+
+    .stat-icon.blue {
+      background: rgba(74, 144, 226, 0.1);
+      color: #4a90e2;
+    }
+
+    .stat-icon.green {
+      background: rgba(39, 174, 96, 0.1);
+      color: #27ae60;
+    }
+
+    .stat-icon.red {
+      background: rgba(235, 87, 87, 0.1);
+      color: #eb5757;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
       font-weight: 600;
-      color: #2d3748;
-      margin-bottom: 0.25rem;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
     }
 
-    .stat-card .stat-label {
-      color: #718096;
-      font-size: 0.9rem;
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.875rem;
     }
 
-    .filter-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
+    .filters-card {
+      background: white;
+      border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       margin-bottom: 2rem;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .transactions-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
+    .filters-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .transactions-table {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
     }
 
     .table {
-      margin: 0;
+      margin-bottom: 0;
     }
 
     .table thead th {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #4a90e2;
       color: white;
       font-weight: 500;
-      border: none;
       padding: 1rem;
+      border: none;
     }
 
     .table tbody td {
       padding: 1rem;
       vertical-align: middle;
+      border-bottom: 1px solid #e9ecef;
     }
 
     .table tbody tr:hover {
-      background-color: rgba(102, 126, 234, 0.05);
+      background-color: #f8f9fa;
+    }
+
+    .transaction-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .transaction-badge.deposit {
+      background: rgba(39, 174, 96, 0.1);
+      color: #27ae60;
+    }
+
+    .transaction-badge.withdrawal {
+      background: rgba(235, 87, 87, 0.1);
+      color: #eb5757;
+    }
+
+    .transaction-badge.transfer {
+      background: rgba(149, 76, 233, 0.1);
+      color: #954ce9;
     }
 
     .transaction-amount {
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
     }
 
     .transaction-amount.positive {
-      color: #48bb78;
+      color: #27ae60;
     }
 
     .transaction-amount.negative {
-      color: #e53e3e;
+      color: #eb5757;
     }
 
-    .transaction-type {
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
-      font-size: 0.875rem;
-      font-weight: 500;
+    .btn-action {
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      background: #f8f9fa;
+      color: #6c757d;
+      transition: all 0.2s ease;
     }
 
-    .transaction-type.deposit {
-      background: #c6f6d5;
-      color: #22543d;
-    }
-
-    .transaction-type.withdrawal {
-      background: #fed7d7;
-      color: #822727;
-    }
-
-    .transaction-type.transfer {
-      background: #e9d8fd;
-      color: #553c9a;
+    .btn-action:hover {
+      background: #4a90e2;
+      color: white;
     }
 
     .pagination {
-      margin-top: 2rem;
-      justify-content: center;
+      padding: 1rem;
+      background: white;
+      border-top: 1px solid #e9ecef;
     }
 
     .page-link {
-      padding: 0.5rem 1rem;
-      margin: 0 0.25rem;
-      border-radius: 8px;
       border: none;
-      color: #4a5568;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 0.5rem 1rem;
+      color: #6c757d;
+      border-radius: 8px;
+      margin: 0 0.25rem;
     }
 
     .page-link:hover {
-      background: #667eea;
+      background: #4a90e2;
       color: white;
     }
 
     .page-item.active .page-link {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #4a90e2;
       color: white;
     }
 
     .empty-state {
+      padding: 4rem 2rem;
       text-align: center;
-      padding: 3rem;
     }
 
-    .empty-state i {
+    .empty-state-icon {
       font-size: 4rem;
-      color: #a0aec0;
-      margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-      color: #2d3748;
-      margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-      color: #718096;
-      margin-bottom: 0;
+      color: #6c757d;
+      margin-bottom: 1.5rem;
     }
 
     @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
+      .transactions-page {
+        padding: 1rem 0;
       }
 
-      .page-header h1 {
-        font-size: 2rem;
-      }
-
-      .stats-container {
+      .stats-grid {
         grid-template-columns: 1fr;
       }
 
-      .filter-card .row {
-        flex-direction: column;
-      }
-
-      .filter-card .col-md-3 {
-        margin-bottom: 1rem;
+      .transaction-badge {
+        padding: 0.35rem 0.75rem;
       }
     }
   </style>
 </head>
-<body>
+<body class="transactions-page">
   <%- include('../partials/navbar') %>
   <%- include('../partials/admin-navbar') %>
 
   <div class="container">
-    <div class="page-header">
-      <h1><i class="fas fa-exchange-alt me-2"></i>User Transactions</h1>
-      <p>Monitor and analyze all user transactions</p>
+    <div class="page-header mb-4">
+      <h1 class="d-flex align-items-center gap-2">
+        <i class="fas fa-exchange-alt text-primary"></i>
+        User Transactions
+      </h1>
+      <p class="text-muted">Monitor and analyze all user transactions</p>
     </div>
 
-    <div class="stats-container">
+    <div class="stats-grid">
       <div class="stat-card">
-        <i class="fas fa-chart-line"></i>
-        <div class="stat-value">$<%= (stats.totalAmount || 0).toFixed(2) %></div>
+        <div class="stat-icon purple">
+          <i class="fas fa-chart-line fa-lg"></i>
+        </div>
+        <div class="stat-value">$245,890</div>
         <div class="stat-label">Total Transaction Volume</div>
       </div>
       <div class="stat-card">
-        <i class="fas fa-calculator"></i>
-        <div class="stat-value">$<%= (stats.avgAmount || 0).toFixed(2) %></div>
-        <div class="stat-label">Average Transaction</div>
-      </div>
-      <div class="stat-card">
-        <i class="fas fa-arrow-up"></i>
-        <div class="stat-value">$<%= (stats.maxAmount || 0).toFixed(2) %></div>
-        <div class="stat-label">Largest Transaction</div>
-      </div>
-      <div class="stat-card">
-        <i class="fas fa-clock"></i>
-        <div class="stat-value"><%= stats.count || 0 %></div>
+        <div class="stat-icon blue">
+          <i class="fas fa-exchange-alt fa-lg"></i>
+        </div>
+        <div class="stat-value">1,432</div>
         <div class="stat-label">Total Transactions</div>
       </div>
-    </div>
-
-    <div class="filter-card">
-      <form action="/admin/user-transactions" method="GET" class="mb-0">
-        <div class="row g-3">
-          <div class="col-md-3">
-            <label class="form-label">Start Date</label>
-            <input type="date" name="startDate" class="form-control" value="<%= filters.startDate %>">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">End Date</label>
-            <input type="date" name="endDate" class="form-control" value="<%= filters.endDate %>">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Transaction Type</label>
-            <select name="type" class="form-select">
-              <option value="">All Types</option>
-              <% transactionTypes.forEach(type => { %>
-                <option value="<%= type %>" <%= filters.type === type ? 'selected' : '' %>><%= type %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">User</label>
-            <select name="user" class="form-select">
-              <option value="">All Users</option>
-              <% users.forEach(user => { %>
-                <option value="<%= user.email %>" <%= filters.user === user.email ? 'selected' : '' %>>
-                  <%= user.name %> (<%= user.email %>)
-                </option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="col-12 text-end">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-filter me-2"></i>Apply Filters
-            </button>
-            <a href="/admin/user-transactions" class="btn btn-secondary ms-2">
-              <i class="fas fa-times me-2"></i>Clear Filters
-            </a>
-          </div>
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <i class="fas fa-arrow-up fa-lg"></i>
         </div>
-      </form>
+        <div class="stat-value">$158,230</div>
+        <div class="stat-label">Total Deposits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <i class="fas fa-arrow-down fa-lg"></i>
+        </div>
+        <div class="stat-value">$87,660</div>
+        <div class="stat-label">Total Withdrawals</div>
+      </div>
     </div>
 
-    <div class="transactions-card">
+    <div class="filters-card">
+      <h2 class="filters-title">
+        <i class="fas fa-filter text-primary"></i>
+        Filter Transactions
+      </h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Transaction Type</label>
+          <select class="form-select">
+            <option value="">All Types</option>
+            <option value="deposit">Deposit</option>
+            <option value="withdrawal">Withdrawal</option>
+            <option value="transfer">Transfer</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Date Range</label>
+          <select class="form-select">
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Amount Range</label>
+          <select class="form-select">
+            <option value="">All Amounts</option>
+            <option value="0-100">$0 - $100</option>
+            <option value="101-1000">$101 - $1,000</option>
+            <option value="1001+">$1,001+</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select">
+            <option value="">All Status</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="transactions-table">
       <div class="table-responsive">
         <table class="table">
           <thead>
             <tr>
-              <th>Date</th>
+              <th>Transaction ID</th>
               <th>User</th>
               <th>Type</th>
               <th>Amount</th>
               <th>Status</th>
+              <th>Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <% if (transactions.length === 0) { %>
-              <tr>
-                <td colspan="6">
-                  <div class="empty-state">
-                    <i class="fas fa-search"></i>
-                    <h3>No Transactions Found</h3>
-                    <p>Try adjusting your filters or check back later.</p>
-                  </div>
-                </td>
-              </tr>
-            <% } else { %>
+            <% if (transactions && transactions.length > 0) { %>
               <% transactions.forEach(transaction => { %>
                 <tr>
                   <td>
-                    <i class="fas fa-calendar me-2"></i>
-                    <%= new Date(transaction.date).toLocaleDateString() %>
-                    <br>
-                    <small class="text-muted">
-                      <%= new Date(transaction.date).toLocaleTimeString() %>
-                    </small>
+                    <span class="fw-medium">#<%= transaction.id %></span>
                   </td>
                   <td>
-                    <div class="d-flex align-items-center">
-                      <div class="ms-2">
-                        <%= transaction.userName %>
-                        <br>
-                        <small class="text-muted"><%= transaction.userEmail %></small>
+                    <div class="d-flex align-items-center gap-2">
+                      <img src="<%= transaction.userAvatar %>" alt="" class="rounded-circle" width="32" height="32">
+                      <div>
+                        <div class="fw-medium"><%= transaction.userName %></div>
+                        <div class="small text-muted"><%= transaction.userEmail %></div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <span class="transaction-type <%= transaction.type.toLowerCase() %>">
+                    <span class="transaction-badge <%= transaction.type.toLowerCase() %>">
+                      <i class="fas fa-<%= transaction.type === 'Deposit' ? 'arrow-up' : transaction.type === 'Withdrawal' ? 'arrow-down' : 'exchange-alt' %>"></i>
                       <%= transaction.type %>
                     </span>
                   </td>
                   <td>
-                    <span class="transaction-amount <%= parseFloat(transaction.amount) >= 0 ? 'positive' : 'negative' %>">
-                      $<%= Math.abs(transaction.amount).toFixed(2) %>
+                    <span class="transaction-amount <%= transaction.type === 'Deposit' ? 'positive' : 'negative' %>">
+                      <%= transaction.type === 'Deposit' ? '+' : '-' %>$<%= transaction.amount %>
                     </span>
                   </td>
                   <td>
-                    <span class="badge bg-success">Completed</span>
+                    <span class="badge bg-<%= transaction.status === 'Completed' ? 'success' : transaction.status === 'Pending' ? 'warning' : 'danger' %>">
+                      <%= transaction.status %>
+                    </span>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="viewDetails('<%= transaction._id %>')">
-                      <i class="fas fa-eye"></i>
-                    </button>
+                    <div><%= transaction.date %></div>
+                    <div class="small text-muted"><%= transaction.time %></div>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <button class="btn-action" onclick="viewDetails('<%= transaction.id %>')" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn-action" onclick="downloadReceipt('<%= transaction.id %>')" title="Download Receipt">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
-              <% }) %>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="7">
+                  <div class="empty-state">
+                    <i class="fas fa-receipt empty-state-icon"></i>
+                    <h3>No Transactions Found</h3>
+                    <p class="text-muted">There are no transactions matching your filters.</p>
+                  </div>
+                </td>
+              </tr>
             <% } %>
           </tbody>
         </table>
       </div>
 
-      <% if (totalPages > 1) { %>
-        <nav aria-label="Transaction navigation">
-          <ul class="pagination">
-            <% if (currentPage > 1) { %>
-              <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>&type=<%= filters.type %>&user=<%= filters.user %>">
-                  <i class="fas fa-chevron-left"></i>
-                </a>
-              </li>
-            <% } %>
-
-            <% for(let i = 1; i <= totalPages; i++) { %>
-              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>&type=<%= filters.type %>&user=<%= filters.user %>">
-                  <%= i %>
-                </a>
-              </li>
-            <% } %>
-
-            <% if (currentPage < totalPages) { %>
-              <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage + 1 %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>&type=<%= filters.type %>&user=<%= filters.user %>">
-                  <i class="fas fa-chevron-right"></i>
-                </a>
-              </li>
-            <% } %>
+      <% if (transactions && transactions.length > 0) { %>
+        <nav class="pagination">
+          <ul class="pagination mb-0 justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">Next</a>
+            </li>
           </ul>
         </nav>
       <% } %>
     </div>
   </div>
+  <%- include('../partials/footer') %>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
     function viewDetails(transactionId) {
-      // Implement transaction details view
-      alert('View transaction details: ' + transactionId);
+      // Implement view details functionality
+      console.log('View details for transaction:', transactionId);
+    }
+
+    function downloadReceipt(transactionId) {
+      // Implement download receipt functionality
+      console.log('Download receipt for transaction:', transactionId);
     }
   </script>
 </body>

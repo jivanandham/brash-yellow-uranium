@@ -3,30 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add User</title>
+    <title>Add User | Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header-footer.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/admin-forms.css">
 </head>
-<body>
-    <div class="container my-5">
-        <h1>Add New User</h1>
-        <form action="/admin/add-user" method="POST">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+<body class="admin-form">
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/admin-navbar') %>
+    
+    <div class="container py-4">
+        <div class="form-container">
+            <div class="page-header">
+                <h1>
+                    <i class="fas fa-user-plus"></i>
+                    Add New User
+                </h1>
+                <p>Create a new user account with specific roles and permissions</p>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="role" class="form-label">Role</label>
-                <select class="form-select" id="role" name="role">
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Add User</button>
-        </form>
+
+            <form action="/admin/add-user" method="POST" class="form-card">
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="fas fa-user"></i>
+                        Basic Information
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required
+                                       placeholder="Enter user's full name">
+                                <div class="form-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    Enter the user's complete name as it should appear
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required
+                                       placeholder="Enter user's email address">
+                                <div class="form-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    This email will be used for login and communications
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="fas fa-user-shield"></i>
+                        Role & Permissions
+                    </h2>
+                    <div class="mb-3">
+                        <label class="form-label d-block">Select User Role</label>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="role-option" onclick="selectRole('user')">
+                                    <input type="radio" name="role" value="user" checked class="d-none" id="roleUser">
+                                    <i class="fas fa-user"></i>
+                                    <div class="role-details">
+                                        <div class="role-name">Standard User</div>
+                                        <div class="role-description">Can access basic features and manage own account</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="role-option" onclick="selectRole('admin')">
+                                    <input type="radio" name="role" value="admin" class="d-none" id="roleAdmin">
+                                    <i class="fas fa-user-shield"></i>
+                                    <div class="role-details">
+                                        <div class="role-name">Administrator</div>
+                                        <div class="role-description">Full access to all features and settings</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Create User
+                    </button>
+                    <a href="/admin/users" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <%- include('../partials/footer') %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function selectRole(role) {
+            // Remove selected class from all options
+            document.querySelectorAll('.role-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            const selectedOption = document.querySelector(`.role-option input[value="${role}"]`).closest('.role-option');
+            selectedOption.classList.add('selected');
+            
+            // Check the radio input
+            document.querySelector(`input[value="${role}"]`).checked = true;
+        }
+
+        // Initialize selected state
+        window.addEventListener('load', () => {
+            const checkedRole = document.querySelector('input[name="role"]:checked').value;
+            selectRole(checkedRole);
+        });
+    </script>
 </body>
 </html>

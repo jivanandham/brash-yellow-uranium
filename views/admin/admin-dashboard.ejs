@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user-navbar.css">
+  <link rel="stylesheet" href="/css/user-dashboard.css">
+  <link rel="stylesheet" href="/css/dashboard-header.css">
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+<body class="admin-dashboard">
+  <%- include('../partials/navbar') %>
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="container py-4">
+    <div class="welcome-banner" data-aos="fade-up">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1>Welcome Back, <%= user.name %>! 👋</h1>
+          <p class="mb-0">Access your administrative tools and manage your platform efficiently.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <div class="current-time" id="currentTime"></div>
+          <div class="current-date" id="currentDate"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-stats">
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-icon-wrapper">
+          <i class="fas fa-users stat-icon"></i>
+        </div>
+        <div class="stat-value"><%- typeof totalUsers !== 'undefined' ? totalUsers : '0' %></div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-trend">
+          <i class="fas fa-arrow-up text-success"></i>
+          <span>12% this week</span>
+        </div>
+      </div>
+
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-icon-wrapper">
+          <i class="fas fa-exchange-alt stat-icon"></i>
+        </div>
+        <div class="stat-value"><%- typeof totalTransactions !== 'undefined' ? totalTransactions : '0' %></div>
+        <div class="stat-label">Transactions</div>
+        <div class="stat-trend">
+          <i class="fas fa-arrow-up text-success"></i>
+          <span>8% this month</span>
+        </div>
+      </div>
+
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-icon-wrapper">
+          <i class="fas fa-user-shield stat-icon"></i>
+        </div>
+        <div class="stat-value"><%- typeof activeAdmins !== 'undefined' ? activeAdmins : '1' %></div>
+        <div class="stat-label">Active Admins</div>
+        <div class="stat-trend">
+          <i class="fas fa-minus text-warning"></i>
+          <span>No change</span>
+        </div>
+      </div>
+
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="stat-icon-wrapper">
+          <i class="fas fa-chart-line stat-icon"></i>
+        </div>
+        <div class="stat-value"><%- typeof growthRate !== 'undefined' ? growthRate : '0' %>%</div>
+        <div class="stat-label">Growth Rate</div>
+        <div class="stat-trend">
+          <i class="fas fa-arrow-up text-success"></i>
+          <span>5% this month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="card-header">
+          <i class="fas fa-users-cog icon"></i>
+          <span class="badge bg-success">Active</span>
+        </div>
+        <h3>User Management</h3>
+        <p>Manage user accounts, roles, and permissions with comprehensive controls.</p>
+        <div class="actions">
+          <a href="/admin/users" class="action-btn primary">
+            <i class="fas fa-eye"></i>
+            View Users
+          </a>
+          <a href="/admin/add-user" class="action-btn secondary">
+            <i class="fas fa-plus"></i>
+            Add User
+          </a>
+        </div>
+      </div>
+
+      <div class="dashboard-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="card-header">
+          <i class="fas fa-chart-bar icon"></i>
+          <span class="badge bg-info">Updated</span>
+        </div>
+        <h3>Analytics & Reports</h3>
+        <p>Access detailed analytics and generate comprehensive reports.</p>
+        <div class="actions">
+          <a href="/admin/user-transactions" class="action-btn primary">
+            <i class="fas fa-exchange-alt"></i>
+            Transactions
+          </a>
+          <a href="/admin/error-logs" class="action-btn secondary">
+            <i class="fas fa-exclamation-triangle"></i>
+            Error Logs
+          </a>
+        </div>
+      </div>
+
+      <div class="dashboard-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="card-header">
+          <i class="fas fa-cogs icon"></i>
+          <span class="badge bg-warning">Maintenance</span>
+        </div>
+        <h3>System Settings</h3>
+        <p>Configure platform settings and customize user experience.</p>
+        <div class="actions">
+          <a href="/admin/settings" class="action-btn primary">
+            <i class="fas fa-sliders-h"></i>
+            Settings
+          </a>
+          <a href="/admin/settings/notifications" class="action-btn secondary">
+            <i class="fas fa-bell"></i>
+            Notifications
+          </a>
+        </div>
+      </div>
+
+      <div class="dashboard-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="card-header">
+          <i class="fas fa-user-shield icon"></i>
+          <span class="badge bg-primary">Profile</span>
+        </div>
+        <h3>Admin Controls</h3>
+        <p>Access administrative tools and manage your profile.</p>
+        <div class="actions">
+          <a href="/admin/profile" class="action-btn primary">
+            <i class="fas fa-user"></i>
+            Profile
+          </a>
+          <a href="/admin/profile/edit" class="action-btn secondary">
+            <i class="fas fa-edit"></i>
+            Edit Profile
+          </a>
+        </div>
+      </div>
+
+      <div class="dashboard-card" data-aos="fade-up" data-aos-delay="500">
+        <div class="card-header">
+          <i class="fas fa-shield-alt icon"></i>
+          <span class="badge bg-danger">Important</span>
+        </div>
+        <h3>Security</h3>
+        <p>Monitor and manage platform security settings.</p>
+        <div class="actions">
+          <a href="/admin/security" class="action-btn primary">
+            <i class="fas fa-lock"></i>
+            Security Dashboard
+          </a>
+          <a href="/admin/security/audit" class="action-btn secondary">
+            <i class="fas fa-history"></i>
+            Audit Logs
+          </a>
+        </div>
+      </div>
+
+      <div class="dashboard-card" data-aos="fade-up" data-aos-delay="600">
+        <div class="card-header">
+          <i class="fas fa-life-ring icon"></i>
+          <span class="badge bg-secondary">Support</span>
+        </div>
+        <h3>Support</h3>
+        <p>Access support tools and manage user inquiries.</p>
+        <div class="actions">
+          <a href="/admin/support" class="action-btn primary">
+            <i class="fas fa-headset"></i>
+            Support Center
+          </a>
+          <a href="/admin/tickets" class="action-btn secondary">
+            <i class="fas fa-ticket-alt"></i>
+            View Tickets
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100
+    });
+
+    // Update time and date
+    function updateDateTime() {
+      const now = new Date();
+      
+      // Time
+      const timeElement = document.getElementById('currentTime');
+      timeElement.textContent = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+      
+      // Date
+      const dateElement = document.getElementById('currentDate');
+      dateElement.textContent = now.toLocaleDateString('en-US', { 
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Update immediately and then every second
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+  </script>
+</body>
+</html>

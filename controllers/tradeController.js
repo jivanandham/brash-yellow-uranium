@@ -133,8 +133,7 @@ exports.executeTrade = async (req, res) => {
         console.log('Received trade request:', req.body);
         
         const { type, symbol, companyName, quantity, price } = req.body;
-        const userEmail = req.oidc.user.email;
-        const userId = req.oidc.user.sub;  // Auth0 ID
+        const user = req.user; // Get user from request object (set by ensureUser middleware)
 
         // Validate input
         if (!type || !symbol || !companyName || !quantity || !price) {
@@ -158,46 +157,11 @@ exports.executeTrade = async (req, res) => {
             });
         }
 
-        // Get or create user
-        let user = await User.findOne({ 
-            $or: [
-                { _id: userId },
-                { email: userEmail }
-            ]
-        });
-
         if (!user) {
-            // Create new user if not exists
-            user = new User({
-                _id: userId,  // Use Auth0 ID as MongoDB _id
-                email: userEmail,
-                name: req.oidc.user.name || userEmail.split('@')[0],
-                picture: req.oidc.user.picture,
-                role: 'user'
+            return res.status(401).json({
+                success: false,
+                message: 'User not found'
             });
-            try {
-                await user.save();
-                console.log('Created new user:', user);
-            } catch (error) {
-                console.error('Error creating user:', error);
-                return res.status(500).json({
-                    success: false,
-                    message: 'Error creating user account'
-                });
-            }
-        } else if (user._id !== userId) {
-            // If user exists but has a different _id, update it
-            user._id = userId;
-            try {
-                await user.save();
-                console.log('Updated user ID:', user);
-            } catch (error) {
-                console.error('Error updating user ID:', error);
-                return res.status(500).json({
-                    success: false,
-                    message: 'Error updating user account'
-                });
-            }
         }
 
         const totalValue = quantity * price;
@@ -219,7 +183,7 @@ exports.executeTrade = async (req, res) => {
         } else if (type === 'sell') {
             // Get current holdings using user's email
             const holding = await Holding.findOne({ 
-                userEmail: userEmail,
+                userEmail: user.email,
                 symbol: symbol
             });
 
@@ -244,8 +208,8 @@ exports.executeTrade = async (req, res) => {
 
         // Create order
         const order = new Order({
-            userId: userId,  // Include Auth0 ID
-            userEmail: userEmail,
+            userId: user._id,
+            userEmail: user.email,
             symbol,
             companyName,
             type,
@@ -258,8 +222,8 @@ exports.executeTrade = async (req, res) => {
 
         // Create transaction
         const transaction = new Transaction({
-            userId: userId,  // Include Auth0 ID
-            userEmail: userEmail,
+            userId: user._id,
+            userEmail: user.email,
             type: 'stock_' + type,
             amount: type === 'buy' ? -totalValue : totalValue,
             balance: user.walletBalance,
@@ -280,8 +244,7 @@ exports.executeTrade = async (req, res) => {
                 transaction.save()
             ]);
 
-            // Update holdings after saving order and transaction
-            await updateHoldings(userEmail, userEmail, symbol, companyName, type, quantity, price);
+            await updateHoldings(user._id, user.email, symbol, companyName, type, quantity, price);
 
             console.log('Successfully saved all trade records and updated holdings');
 

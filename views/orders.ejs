@@ -6,14 +6,24 @@
     <title>Orders History</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/header-footer.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/user-navbar.css">
     <link rel="stylesheet" href="/css/orders.css">
+    <link rel="stylesheet" href="/css/dashboard-header.css">
 </head>
 <body>
     <%- include('partials/navbar') %>
     <% if (isAuthenticated) { %>
         <%- include('partials/user-navbar') %>
     <% } %>
+
+    <%- include('partials/dashboard-header', {
+        title: 'Orders History',
+        description: 'Track your trading activity and order status',
+        showBalance: false
+    }) %>
 
     <div class="orders-container">
         <!-- Hidden wallet balance for JavaScript use -->
@@ -27,10 +37,6 @@
                     <h2>Order History</h2>
                 </div>
                 <div class="col-auto">
-                    <div class="balance-display">
-                        <i class="fas fa-wallet"></i>
-                        Available Balance: <span class="fw-bold text-success">$<%= typeof user.walletBalance !== 'undefined' ? user.walletBalance.toFixed(2) : '0.00' %></span>
-                    </div>
                 </div>
             </div>
 

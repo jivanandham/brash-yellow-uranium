@@ -7,47 +7,83 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    .notifications-page {
+      background-color: #f8f9fa;
       min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-
-    .container {
-      padding: 2rem 1rem;
-      max-width: 1200px;
+      padding: 2rem 0;
     }
 
     .page-header {
       margin-bottom: 2rem;
-      color: #2d3748;
     }
 
     .page-header h1 {
-      font-size: 2.5rem;
+      font-size: 2rem;
       font-weight: 600;
+      color: #2c3e50;
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .page-header p {
-      color: #718096;
+      color: #6c757d;
       font-size: 1.1rem;
       margin-bottom: 0;
     }
 
     .notifications-container {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .filter-bar {
+      background: #f8f9fa;
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid #e9ecef;
+    }
+
+    .form-switch {
+      padding-left: 3.5rem;
+      margin-bottom: 0;
+    }
+
+    .form-switch .form-check-input {
+      width: 3rem;
+      height: 1.5rem;
+      margin-left: -3.5rem;
+      background-color: #e9ecef;
+      border: none;
+      cursor: pointer;
+    }
+
+    .form-switch .form-check-input:checked {
+      background-color: #3498db;
+      border-color: #3498db;
+    }
+
+    .form-switch .form-check-label {
+      color: #2c3e50;
+      font-weight: 500;
+      cursor: pointer;
     }
 
     .notification-item {
+      background: #fff;
+      border: 1px solid #e9ecef;
+      border-radius: 0.75rem;
       padding: 1.5rem;
-      border-radius: 10px;
-      background: #f7fafc;
       margin-bottom: 1rem;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       position: relative;
     }
 
@@ -57,177 +93,225 @@
     }
 
     .notification-item.unread {
-      background: #ebf8ff;
-      border-left: 4px solid #4299e1;
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+    }
+
+    .notification-type {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      padding: 0.35rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .notification-type.info {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .notification-type.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .notification-type.warning {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .notification-type.error {
+      background: #ffebee;
+      color: #c62828;
     }
 
     .notification-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      padding-right: 6rem;
     }
 
     .notification-title {
-      font-weight: 600;
-      color: #2d3748;
       font-size: 1.1rem;
-      margin-right: 1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .notification-title i {
+      color: #3498db;
     }
 
     .notification-time {
       font-size: 0.875rem;
-      color: #718096;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .notification-message {
-      color: #4a5568;
-      margin-bottom: 1rem;
+      color: #2c3e50;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
     }
 
     .notification-actions {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
-    .profile-action-btn {
+    .btn-action {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #ffffff;
-      background: var(--gradient-primary);
+      transition: all 0.2s ease;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      width: auto;
     }
 
-    .profile-action-btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
+    .btn-action.primary {
+      background-color: #3498db;
       color: white;
     }
 
-    .profile-action-btn.small {
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
+    .btn-action.primary:hover {
+      background-color: #2980b9;
     }
 
-    .notification-type {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
+    .btn-action.danger {
+      background-color: #fff;
+      color: #e74c3c;
+      border: 1px solid #e74c3c;
     }
 
-    .notification-type.info {
-      background: #ebf8ff;
-      color: #2b6cb0;
-    }
-
-    .notification-type.success {
-      background: #c6f6d5;
-      color: #22543d;
-    }
-
-    .notification-type.warning {
-      background: #feebc8;
-      color: #744210;
-    }
-
-    .notification-type.error {
-      background: #fed7d7;
-      color: #822727;
+    .btn-action.danger:hover {
+      background-color: #e74c3c;
+      color: white;
     }
 
     .empty-state {
       text-align: center;
-      padding: 3rem;
+      padding: 4rem 2rem;
     }
 
     .empty-state i {
-      font-size: 4rem;
-      color: #a0aec0;
-      margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-      color: #2d3748;
-      margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-      color: #718096;
+      font-size: 3rem;
+      color: #95a5a6;
       margin-bottom: 1.5rem;
     }
 
-    .filter-bar {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
+    .empty-state h3 {
+      color: #2c3e50;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-state p {
+      color: #7f8c8d;
+      margin-bottom: 0;
+    }
+
+    .pagination {
+      margin-top: 2rem;
+      gap: 0.25rem;
+    }
+
+    .page-link {
+      color: #2c3e50;
+      border: 1px solid #e9ecef;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      transition: all 0.2s ease;
+    }
+
+    .page-link:hover {
+      background-color: #e9ecef;
+      border-color: #dee2e6;
+      color: #1a252f;
+    }
+
+    .page-item.active .page-link {
+      background-color: #3498db;
+      border-color: #3498db;
+      color: white;
+    }
+
+    .page-item.disabled .page-link {
+      color: #6c757d;
+      pointer-events: none;
+      background-color: #f8f9fa;
+      border-color: #e9ecef;
     }
 
     @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
+      .notifications-page {
+        padding: 1rem 0;
       }
 
-      .page-header h1 {
-        font-size: 2rem;
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
       }
 
       .notification-header {
         flex-direction: column;
+        gap: 0.5rem;
+        padding-right: 0;
       }
 
-      .notification-time {
-        margin-top: 0.5rem;
+      .notification-type {
+        position: static;
+        display: inline-block;
+        margin-bottom: 0.75rem;
       }
 
       .notification-actions {
         flex-direction: column;
-        gap: 0.5rem;
       }
 
-      .btn-custom {
+      .btn-action {
         width: 100%;
+        justify-content: center;
       }
     }
   </style>
 </head>
-<body>
+<body class="notifications-page">
   <%- include('../partials/navbar') %>
   <%- include('../partials/admin-navbar') %>
 
   <div class="container">
     <div class="page-header">
-      <h1><i class="fas fa-bell me-2"></i>Notifications</h1>
-      <p>View and manage your notifications</p>
+      <h1>
+        <i class="fas fa-bell text-primary"></i>
+        Notifications
+      </h1>
+      <p>Stay updated with system alerts and important messages</p>
     </div>
 
     <div class="notifications-container">
       <div class="filter-bar">
-        <div class="form-check form-switch">
+        <div class="form-switch">
           <input class="form-check-input" type="checkbox" id="showUnreadOnly" onchange="toggleUnread()">
-          <label class="form-check-label" for="showUnreadOnly">Show unread only</label>
+          <label class="form-check-label" for="showUnreadOnly">Show unread notifications only</label>
         </div>
         <div class="ms-auto">
-          <button class="profile-action-btn" onclick="markAllAsRead()">
-            <i class="fas fa-check-double me-2"></i>Mark All as Read
+          <button class="btn-action primary" onclick="markAllAsRead()">
+            <i class="fas fa-check-double"></i>
+            Mark All as Read
           </button>
         </div>
       </div>
@@ -241,11 +325,11 @@
               </span>
               <div class="notification-header">
                 <div class="notification-title">
-                  <i class="<%= notification.icon %> me-2"></i>
+                  <i class="<%= notification.icon %>"></i>
                   <%= notification.title %>
                 </div>
                 <div class="notification-time">
-                  <i class="fas fa-clock me-1"></i>
+                  <i class="fas fa-clock"></i>
                   <%= new Date(notification.date).toLocaleString() %>
                 </div>
               </div>
@@ -254,12 +338,14 @@
               </div>
               <div class="notification-actions">
                 <% if (!notification.read) { %>
-                  <button class="profile-action-btn small" onclick="markAsRead('<%= notification._id %>')">
-                    <i class="fas fa-check me-1"></i>Mark as Read
+                  <button class="btn-action primary" onclick="markAsRead('<%= notification._id %>')">
+                    <i class="fas fa-check"></i>
+                    Mark as Read
                   </button>
                 <% } %>
-                <button class="profile-action-btn small" onclick="deleteNotification('<%= notification._id %>')">
-                  <i class="fas fa-trash me-1"></i>Delete
+                <button class="btn-action danger" onclick="deleteNotification('<%= notification._id %>')">
+                  <i class="fas fa-trash"></i>
+                  Delete
                 </button>
               </div>
             </div>
@@ -274,15 +360,13 @@
       </div>
 
       <% if (totalPages > 1) { %>
-        <nav aria-label="Notifications navigation" class="mt-4">
+        <nav aria-label="Notifications pagination">
           <ul class="pagination justify-content-center">
-            <% if (currentPage > 1) { %>
-              <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>">
-                  <i class="fas fa-chevron-left"></i>
-                </a>
-              </li>
-            <% } %>
+            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>
+                <i class="fas fa-chevron-left"></i>
+              </a>
+            </li>
 
             <% for(let i = 1; i <= totalPages; i++) { %>
               <li class="page-item <%= currentPage === i ? 'active' : '' %>">
@@ -290,21 +374,22 @@
               </li>
             <% } %>
 
-            <% if (currentPage < totalPages) { %>
-              <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage + 1 %>">
-                  <i class="fas fa-chevron-right"></i>
-                </a>
-              </li>
-            <% } %>
+            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage + 1 %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
           </ul>
         </nav>
       <% } %>
     </div>
   </div>
 
+  <%- include('../partials/footer') %>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Mark single notification as read
     async function markAsRead(notificationId) {
       try {
         const response = await fetch(`/admin/notifications/${notificationId}/read`, {
@@ -314,7 +399,7 @@
         if (response.ok) {
           const notification = document.getElementById(`notification-${notificationId}`);
           notification.classList.remove('unread');
-          const markAsReadBtn = notification.querySelector('.profile-action-btn.small');
+          const markAsReadBtn = notification.querySelector('.btn-action.primary');
           if (markAsReadBtn) markAsReadBtn.remove();
           updateNotificationCount();
         } else {
@@ -322,10 +407,11 @@
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Failed to mark notification as read. Please try again.');
+        showToast('error', 'Failed to mark notification as read');
       }
     }
 
+    // Delete notification
     async function deleteNotification(notificationId) {
       if (!confirm('Are you sure you want to delete this notification?')) return;
 
@@ -336,17 +422,24 @@
 
         if (response.ok) {
           const notification = document.getElementById(`notification-${notificationId}`);
-          notification.remove();
+          notification.style.opacity = '0';
+          setTimeout(() => {
+            notification.remove();
+            if (document.querySelectorAll('.notification-item').length === 0) {
+              location.reload(); // Refresh to show empty state
+            }
+          }, 300);
           updateNotificationCount();
         } else {
           throw new Error('Failed to delete notification');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Failed to delete notification. Please try again.');
+        showToast('error', 'Failed to delete notification');
       }
     }
 
+    // Mark all notifications as read
     async function markAllAsRead() {
       try {
         const response = await fetch('/admin/notifications/mark-all-read', {
@@ -357,19 +450,21 @@
           const unreadNotifications = document.querySelectorAll('.notification-item.unread');
           unreadNotifications.forEach(notification => {
             notification.classList.remove('unread');
-            const markAsReadBtn = notification.querySelector('.profile-action-btn.small');
+            const markAsReadBtn = notification.querySelector('.btn-action.primary');
             if (markAsReadBtn) markAsReadBtn.remove();
           });
           updateNotificationCount();
+          showToast('success', 'All notifications marked as read');
         } else {
           throw new Error('Failed to mark all notifications as read');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Failed to mark all notifications as read. Please try again.');
+        showToast('error', 'Failed to mark all notifications as read');
       }
     }
 
+    // Toggle unread notifications
     function toggleUnread() {
       const showUnreadOnly = document.getElementById('showUnreadOnly').checked;
       const notifications = document.querySelectorAll('.notification-item');
@@ -383,6 +478,7 @@
       });
     }
 
+    // Update notification count in navbar
     async function updateNotificationCount() {
       try {
         const response = await fetch('/admin/notifications/unread-count');
@@ -390,16 +486,18 @@
         
         const countElement = document.getElementById('notificationCount');
         if (countElement) {
-          if (data.count > 0) {
-            countElement.textContent = data.count > 99 ? '99+' : data.count;
-            countElement.style.display = 'inline-block';
-          } else {
-            countElement.style.display = 'none';
-          }
+          countElement.textContent = data.count > 0 ? data.count : '';
+          countElement.style.display = data.count > 0 ? 'block' : 'none';
         }
       } catch (error) {
         console.error('Error updating notification count:', error);
       }
+    }
+
+    // Show toast messages
+    function showToast(type, message) {
+      // You can implement a toast notification system here
+      console.log(`${type}: ${message}`);
     }
   </script>
 </body>

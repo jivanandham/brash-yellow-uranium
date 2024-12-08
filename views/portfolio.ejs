@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/css/header-footer.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/user-navbar.css">
+    <link rel="stylesheet" href="/css/dashboard-header.css">
     <style>
         body {
             background-color: #f4f7f6;
@@ -82,24 +83,14 @@
         <%- include('partials/user-navbar') %>
     <% } %>
 
-    <!-- Portfolio Header -->
-    <div class="portfolio-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h1 class="mb-0">Portfolio</h1>
-                    <p class="mb-0">Track and manage your investments</p>
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-light" onclick="openTradeModal()">
-                        <i class="bi bi-plus-lg"></i> New Trade
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <%- include('partials/dashboard-header', {
+        title: 'Portfolio Details',
+        description: 'View and manage your investment portfolio',
+        showBalance: false,
+        actionButton: '<button class="btn btn-light" onclick="openTradeModal()"><i class="bi bi-plus-lg"></i> New Trade</button>'
+    }) %>
 
-    <div class="container">
+    <div class="container mt-4">
         <!-- Portfolio Metrics -->
         <div class="row mb-4">
             <div class="col-md-3">
@@ -216,6 +207,7 @@
 
     <!-- Trade Modal -->
     <%- include('partials/trade-modal') %>
+    <%- include('partials/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

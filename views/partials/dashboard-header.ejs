@@ -1,0 +1,22 @@
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><%= title %></h1>
+                <p class="mb-0"><%= description %></p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <% if (typeof showBalance !== 'undefined' && showBalance) { %>
+                    <div class="balance-display">
+                        <i class="fas fa-wallet"></i>
+                        <span>Balance: $<%= typeof user.walletBalance !== 'undefined' ? user.walletBalance.toFixed(2) : '0.00' %></span>
+                    </div>
+                <% } %>
+                <% if (typeof actionButton !== 'undefined' && actionButton) { %>
+                    <%- actionButton %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>White Navbar</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user-navbar.css">
   <style>
     /* Custom Navbar Styles */
     .navbar {
@@ -42,43 +45,56 @@
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-    <div class="container-fluid">
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <!-- Admin Dashboard Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard">
+        Admin
+      </a>
+
       <div class="collapse navbar-collapse" id="adminNavbar">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item">
             <a class="nav-link" href="/admin/dashboard">
-              <i class="fas fa-chart-line me-1"></i>Dashboard
+              <i class="fas fa-chart-line"></i> Dashboard
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/admin/users">
-              <i class="fas fa-users me-1"></i>Users
+              <i class="fas fa-users"></i> Users
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/admin/user-transactions">
-              <i class="fas fa-exchange-alt me-1"></i>Transactions
+              <i class="fas fa-exchange-alt"></i> Transactions
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/admin/error-logs">
-              <i class="fas fa-exclamation-triangle me-1"></i>Error Logs
+              <i class="fas fa-exclamation-triangle"></i> Error Logs
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link position-relative" href="/admin/settings">
-              <i class="fas fa-cog me-1"></i>Settings
+              <i class="fas fa-cog"></i> Settings
               <span id="notificationCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;"></span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link <%= locals.path && path.startsWith('/admin/security') ? 'active' : '' %>" href="/admin/security">
-              <i class="fas fa-shield-alt me-2"></i>Security
+              <i class="fas fa-shield-alt"></i> Security
             </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user-circle"></i> Profile
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="/admin/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -86,32 +102,26 @@
   </nav>
 
   <script>
-  // Function to update notification count
-  async function updateNotificationCount() {
-    try {
-      const response = await fetch('/admin/notifications/unread-count');
-      const data = await response.json();
-      
-      const countElement = document.getElementById('notificationCount');
-      if (data.count > 0) {
-        countElement.textContent = data.count > 99 ? '99+' : data.count;
-        countElement.style.display = 'inline-block';
-      } else {
-        countElement.style.display = 'none';
+    async function updateNotificationCount() {
+      try {
+        const response = await fetch('/admin/notifications/unread-count');
+        const data = await response.json();
+        
+        const countElement = document.getElementById('notificationCount');
+        if (data.count > 0) {
+          countElement.textContent = data.count > 99 ? '99+' : data.count;
+          countElement.style.display = 'inline-block';
+        } else {
+          countElement.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error fetching notification count:', error);
       }
-    } catch (error) {
-      console.error('Error fetching notification count:', error);
     }
-  }
 
-  // Update count on page load
-  updateNotificationCount();
-
-  // Update count every 30 seconds
-  setInterval(updateNotificationCount, 30000);
+    updateNotificationCount();
+    setInterval(updateNotificationCount, 30000);
   </script>
-
-  <!-- Bootstrap Bundle JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-QwwpmFZ3CmzcULl90LO6FzFzDWEb5xA7c+6p6EwBgpWg9RCZITT0ho1izR4bFWxZ" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

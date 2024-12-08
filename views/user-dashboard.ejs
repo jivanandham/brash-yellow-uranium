@@ -11,421 +11,49 @@
     <link rel="stylesheet" href="/css/header-footer.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/user-navbar.css">
-    <style>
-        body {
-            background-color: #f4f7f6;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-
-        .card-header {
-            background-color: transparent;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            padding: 1.25rem 1.5rem;
-        }
-
-        .card-header h4 {
-            margin: 0;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .market-data .price {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .change {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .change.positive {
-            background-color: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-        }
-
-        .change.negative {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: #6c757d;
-        }
-
-        .table td {
-            vertical-align: middle;
-        }
-
-        .btn-primary {
-            background-color: #1a237e;
-            border-color: #1a237e;
-            padding: 0.5rem 1.25rem;
-            border-radius: 8px;
-        }
-
-        .btn-primary:hover {
-            background-color: #0d47a1;
-            border-color: #0d47a1;
-        }
-
-        .stock-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.25rem;
-            height: 100%;
-        }
-
-        .stock-info {
-            margin-bottom: 1rem;
-        }
-
-        .charts-section .card {
-            height: 100%;
-        }
-
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            padding: 1.25rem 1.5rem;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        /* Enhanced Dashboard Styles */
-        .dashboard-header {
-            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .dashboard-header h1 {
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .market-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            border: none;
-            overflow: hidden;
-        }
-
-        .market-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-
-        .market-card .card-body {
-            padding: 1.5rem;
-        }
-
-        .market-data .price {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #2c3e50;
-            letter-spacing: -0.5px;
-        }
-
-        .change {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .change.positive {
-            background-color: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-        }
-
-        .change.negative {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-
-        .progress {
-            background-color: rgba(0,0,0,0.05);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            transition: width 0.5s ease;
-        }
-
-        .badge {
-            padding: 0.5rem 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge i {
-            font-size: 0.8rem;
-        }
-
-        /* Animation for price updates */
-        @keyframes priceUpdate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        .price-update {
-            animation: priceUpdate 0.5s ease-out;
-        }
-
-        .charts-section .card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .btn-group .btn {
-            border-radius: 20px;
-            padding: 0.375rem 1rem;
-            font-weight: 500;
-        }
-
-        .btn-group .btn.active {
-            background-color: #1a237e;
-            border-color: #1a237e;
-        }
-
-        .watchlist-item {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            transition: all 0.2s ease;
-            background-color: #fff;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .watchlist-item:hover {
-            background-color: #f8f9fa;
-            transform: translateX(5px);
-        }
-
-        .news-item {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-            transition: all 0.2s ease;
-            background-color: #fff;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .news-item:hover {
-            background-color: #f8f9fa;
-            transform: translateX(5px);
-        }
-
-        .news-item h6 {
-            color: #1a237e;
-            font-weight: 600;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .market-overview, .charts-section, .watchlist-items, .news-items {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Loading Animation */
-        .loading-indicator {
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, #1a237e 0%, #0d47a1 50%, #1a237e 100%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .market-card {
-                margin-bottom: 1rem;
-            }
-            
-            .charts-section .card {
-                margin-bottom: 1rem;
-            }
-            
-            .dashboard-header {
-                padding: 1.5rem 0;
-            }
-            
-            .market-data .price {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Stock Cards Styling */
-        .stock-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .stock-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-
-        .stock-info {
-            margin-bottom: 1rem;
-        }
-
-        .stock-chart {
-            height: 60px;
-            margin-top: 1rem;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-        }
-
-        .stock-card:hover .stock-chart {
-            opacity: 1;
-        }
-
-        .btn-light {
-            background: rgba(0,0,0,0.05);
-            border: none;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .btn-light:hover {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .btn-light i {
-            font-size: 1rem;
-        }
-
-        .list-group-item {
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .stock-symbol {
-            font-weight: 600;
-            color: #1a237e;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/user-dashboard.css">
+    <link rel="stylesheet" href="/css/dashboard-header.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 <body>
   <!-- Include User Navbar -->
   <%- include('partials/navbar') %>
   <%- include('partials/user-navbar') %>
 
-  <div class="dashboard-header">
-    <div class="container">
-      <h1>Portfolio Overview</h1>
-      <p class="mb-0">Track your investments and market performance</p>
-    </div>
-  </div>
+  <%- include('partials/dashboard-header', {
+    title: 'Portfolio Overview',
+    description: 'Track your investments and market performance',
+    showBalance: false,
+    actionButton: '<button class="btn btn-light" onclick="refreshHoldings()"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button>'
+  }) %>
 
   <div class="container mb-4">
     <div class="row">
-      <div class="col-md-3 mb-4">
+      <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="100">
         <div class="market-card">
           <div class="card-body">
             <h6 class="text-muted mb-2">Total Investment</h6>
             <div class="market-data">
               <div class="price">$<%= portfolio.totalInvestment.toFixed(2) %></div>
+              <small class="text-muted">Total Capital Invested</small>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="col-md-3 mb-4">
+      <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="200">
         <div class="market-card">
           <div class="card-body">
             <h6 class="text-muted mb-2">Market Value</h6>
             <div class="market-data">
               <div class="price">$<%= portfolio.totalCurrentValue.toFixed(2) %></div>
+              <small class="text-muted">Current Portfolio Value</small>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="col-md-3 mb-4">
+      <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="300">
         <div class="market-card">
           <div class="card-body">
             <h6 class="text-muted mb-2">Total Profit/Loss</h6>
@@ -441,7 +69,7 @@
         </div>
       </div>
 
-      <div class="col-md-3 mb-4">
+      <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="400">
         <div class="market-card">
           <div class="card-body">
             <h6 class="text-muted mb-2">Holdings</h6>
@@ -455,10 +83,15 @@
     </div>
 
     <div class="row mt-4">
-      <div class="col-12">
+      <div class="col-12" data-aos="fade-up" data-aos-delay="100">
         <div class="market-card">
           <div class="card-body">
-            <h5 class="card-title mb-4">Current Holdings</h5>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="card-title mb-0">Current Holdings</h5>
+              <button class="btn btn-primary" onclick="openTradeModal('buy')">
+                <i class="bi bi-plus-lg"></i> New Trade
+              </button>
+            </div>
             <% if (portfolio.holdings.length > 0) { %>
               <div class="table-responsive">
                 <table class="table">
@@ -484,18 +117,23 @@
                         <td>
                           $<%= holding.currentPrice.toFixed(2) %>
                           <% if (holding.priceChange !== undefined) { %>
-                            <span class="badge <%= holding.priceChange >= 0 ? 'bg-success' : 'bg-danger' %>">
+                            <span class="change <%= holding.priceChange >= 0 ? 'positive' : 'negative' %>">
                               <%= holding.priceChange >= 0 ? '+' : '' %><%= holding.priceChange.toFixed(2) %>%
                             </span>
                           <% } %>
                         </td>
                         <td>$<%= holding.currentValue.toFixed(2) %></td>
-                        <td class="<%= holding.profitLoss >= 0 ? 'text-success' : 'text-danger' %>">
-                          <%= holding.profitLoss >= 0 ? '+' : '-' %>$<%= Math.abs(holding.profitLoss).toFixed(2) %>
-                          <small>(<%= holding.profitLoss >= 0 ? '+' : '' %><%= holding.profitLossPercent.toFixed(2) %>%)</small>
+                        <td>
+                          <div class="<%= holding.profitLoss >= 0 ? 'text-success' : 'text-danger' %>">
+                            <%= holding.profitLoss >= 0 ? '+' : '-' %>$<%= Math.abs(holding.profitLoss).toFixed(2) %>
+                            <small>(<%= holding.profitLoss >= 0 ? '+' : '' %><%= holding.profitLossPercent.toFixed(2) %>%)</small>
+                          </div>
                         </td>
                         <td>
-                          <button class="btn btn-sm btn-primary" onclick="openTradeModal('sell', '<%= holding.symbol %>', <%= holding.currentPrice %>, '<%= holding.companyName %>')">Sell</button>
+                          <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openTradeModal('buy', '<%= holding.symbol %>', <%= holding.currentPrice %>, '<%= holding.companyName %>')">Buy</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="openTradeModal('sell', '<%= holding.symbol %>', <%= holding.currentPrice %>, '<%= holding.companyName %>')">Sell</button>
+                          </div>
                         </td>
                       </tr>
                     <% }); %>
@@ -503,9 +141,12 @@
                 </table>
               </div>
             <% } else { %>
-              <div class="text-center py-4">
-                <i class="bi bi-bar-chart-line fs-1 text-muted"></i>
-                <p class="mt-3 mb-0">No holdings yet. Start trading to build your portfolio!</p>
+              <div class="empty-state">
+                <i class="bi bi-bar-chart-line"></i>
+                <p>No holdings yet. Start trading to build your portfolio!</p>
+                <button class="btn btn-primary mt-3" onclick="openTradeModal('buy')">
+                  <i class="bi bi-plus-lg"></i> Make Your First Trade
+                </button>
               </div>
             <% } %>
           </div>
@@ -514,15 +155,15 @@
     </div>
   </div>
 
-  <!-- TradingView Charts -->
+  <!-- Charts Section -->
   <div class="charts-section mb-4">
     <div class="container">
       <div class="row">
-        <div class="col-12 mb-4">
+        <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="100">
           <div class="card">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title">Market Overview</h5>
+                <h5 class="card-title mb-0">Market Overview</h5>
                 <div class="btn-group" role="group">
                   <button type="button" class="btn btn-outline-primary" data-period="1D">1D</button>
                   <button type="button" class="btn btn-outline-primary" data-period="1W">1W</button>
@@ -536,7 +177,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3" data-aos="fade-up" data-aos-delay="200">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">S&P 500 Performance</h5>
@@ -544,7 +185,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3" data-aos="fade-up" data-aos-delay="300">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">NASDAQ Performance</h5>
@@ -1212,6 +853,10 @@
     document.addEventListener('DOMContentLoaded', function() {
       loadWatchlist();
     });
+  </script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init();
   </script>
 </body>
 </html>

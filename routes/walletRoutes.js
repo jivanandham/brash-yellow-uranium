@@ -14,8 +14,15 @@ router.get('/', async (req, res) => {
     if (!user) {
       return res.redirect('/login');
     }
+
+    // Fetch only 2 most recent transactions
+    const transactions = await Transaction.find({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .limit(2);
+
     res.render('wallet', { 
       user,
+      transactions,
       isAuthenticated: req.oidc.isAuthenticated()
     });
   } catch (err) {
@@ -97,11 +104,20 @@ router.post('/withdraw-funds', async (req, res) => {
   }
 
   try {
-    const amount = parseFloat(req.body.amount);
-    if (isNaN(amount) || amount < 1 || amount > 100000) {
+    const { amount, method } = req.body;
+    const withdrawAmount = parseFloat(amount);
+
+    if (isNaN(withdrawAmount) || withdrawAmount < 100) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid amount. Please enter an amount between $1 and $100,000.'
+        error: 'Minimum withdrawal amount is $100'
+      });
+    }
+
+    if (!['bank_transfer', 'paypal', 'crypto'].includes(method)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid withdrawal method'
       });
     }
 
@@ -110,7 +126,7 @@ router.post('/withdraw-funds', async (req, res) => {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
 
-    if (user.walletBalance < amount) {
+    if (user.walletBalance < withdrawAmount) {
       return res.status(400).json({
         success: false,
         error: 'Insufficient funds in wallet'
@@ -120,7 +136,7 @@ router.post('/withdraw-funds', async (req, res) => {
     // Update wallet balance
     const updatedUser = await User.findOneAndUpdate(
       { email: user.email },
-      { $inc: { walletBalance: -amount } },
+      { $inc: { walletBalance: -withdrawAmount } },
       { new: true }
     );
 
@@ -134,11 +150,12 @@ router.post('/withdraw-funds', async (req, res) => {
     // Create transaction record
     const transaction = await Transaction.create({
       userEmail: user.email,
-      userId: req.oidc.user.sub,
+      userId: user._id,
       type: 'withdraw',
-      amount: -amount,
+      amount: withdrawAmount,
       balance: updatedUser.walletBalance,
-      description: 'Withdrawn funds from wallet',
+      description: `Withdrawn via ${method.replace('_', ' ')}`,
+      withdrawalMethod: method,
       status: 'completed'
     });
 
@@ -149,7 +166,7 @@ router.post('/withdraw-funds', async (req, res) => {
     res.json({
       success: true,
       newBalance: updatedUser.walletBalance,
-      message: `Successfully withdrawn $${amount.toFixed(2)} from your wallet`
+      message: `Successfully withdrawn $${withdrawAmount.toFixed(2)} from your wallet`
     });
   } catch (err) {
     console.error('Error withdrawing funds:', err);
@@ -177,15 +194,12 @@ router.get('/transaction-history', async (req, res) => {
     }
 
     // Get total count for pagination
-    const totalTransactions = await Transaction.countDocuments({ userEmail: user.email, userId: req.oidc.user.sub });
+    const totalTransactions = await Transaction.countDocuments({ userEmail: user.email });
     const totalPages = Math.ceil(totalTransactions / limit);
 
     // Get transactions for current page
-    const transactions = await Transaction.find({ 
-      userEmail: user.email,
-      userId: req.oidc.user.sub
-    })
-      .sort({ date: -1 })
+    const transactions = await Transaction.find({ userEmail: user.email })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -200,15 +214,10 @@ router.get('/transaction-history', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching transaction history:', err);
-    res.render('transaction-history', {
-      user: req.oidc.user,
-      transactions: [],
-      currentPage: 1,
-      totalPages: 0,
-      hasPrevPage: false,
-      hasNextPage: false,
-      isAuthenticated: req.oidc.isAuthenticated(),
-      error: 'Failed to load transactions. Please try again.'
+    res.status(500).render('error', {
+      message: 'Error loading transaction history',
+      error: err,
+      isAuthenticated: req.oidc.isAuthenticated()
     });
   }
 });

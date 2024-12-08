@@ -12,69 +12,84 @@
         <div class="row g-4">
             <!-- Company Info -->
             <div class="col-lg-4 mb-4 mb-lg-0">
-                <div class="company-info">
-                    <a href="/" class="footer-brand d-inline-flex align-items-center mb-3">
-                        <img src="https://cdn.glitch.me/8744b9b1-55f9-4d29-8fca-c4b1415d9c43/stockbull.png?v=1731384958477" alt="StockBull Logo" class="me-2" height="40">
-                        <span>StockBull</span>
+                <a href="/" class="footer-brand d-inline-flex align-items-center mb-4">
+                    <img src="https://cdn.glitch.me/8744b9b1-55f9-4d29-8fca-c4b1415d9c43/stockbull.png?v=1731384958477" alt="StockBull Logo" class="me-2" height="35">
+                    StockBull
+                </a>
+                <p class="footer-description mb-4">Empowering your financial journey with secure and innovative stock trading solutions.</p>
+                <div class="social-links">
+                    <a href="#" class="social-icon" aria-label="Twitter">
+                        <i class="bi bi-twitter"></i>
                     </a>
-                    <p class="text-muted mb-4">Empowering your financial journey with secure and innovative stock trading solutions.</p>
+                    <a href="#" class="social-icon" aria-label="Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="LinkedIn">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
                 </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6">
+                <h6 class="footer-heading mb-4">Quick Links</h6>
+                <ul class="footer-links">
+                    <li><a href="/markets/stocks"><i class="bi bi-graph-up me-2"></i>Stocks</a></li>
+                    <li><a href="/markets/etf"><i class="bi bi-pie-chart me-2"></i>ETFs</a></li>
+                    <li><a href="/markets/mutual-funds"><i class="bi bi-cash-stack me-2"></i>Mutual Funds</a></li>
+                    <li><a href="/markets/currency"><i class="bi bi-currency-exchange me-2"></i>Currency</a></li>
+                </ul>
             </div>
 
             <!-- Resources -->
             <div class="col-lg-3 col-md-6">
                 <h6 class="footer-heading mb-4">Resources</h6>
-                <ul class="list-unstyled footer-links">
+                <ul class="footer-links">
                     <li><a href="/blog"><i class="bi bi-journal-text me-2"></i>Blog</a></li>
                     <li><a href="/market-news"><i class="bi bi-newspaper me-2"></i>Market News</a></li>
-                    <li><a href="/trading-guide"><i class="bi bi-book me-2"></i>Trading Guide</a></li>
-                    <li><a href="/api-docs"><i class="bi bi-code-square me-2"></i>API Docs</a></li>
-                    <li><a href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
-                        <i class="bi bi-question-circle me-2"></i>Help Center
-                    </a></li>
+                    <li><a href="/learn"><i class="bi bi-book me-2"></i>Learn Trading</a></li>
+                    <li><a href="/help"><i class="bi bi-question-circle me-2"></i>Help Center</a></li>
                 </ul>
             </div>
 
             <!-- Newsletter -->
-            <div class="col-lg-5 col-md-6">
-                <div class="newsletter-section">
-                    <h6 class="footer-heading mb-4">Stay Updated</h6>
-                    <p class="text-muted mb-3">Get the latest market insights and updates delivered to your inbox.</p>
-                    <form id="newsletterForm" class="newsletter-form">
-                        <div class="input-group">
-                            <input type="email" class="form-control" placeholder="Enter your email" required>
-                            <button class="btn btn-primary subscribe-btn" type="submit">
-                                <i class="bi bi-send"></i>
-                                <span>Subscribe</span>
-                            </button>
-                        </div>
-                        <div class="form-text mt-2 newsletter-message"></div>
-                    </form>
-                    <div class="mt-3 d-flex gap-2">
-                        <span class="security-badge">
-                            <i class="bi bi-shield-check me-1"></i>SSL Secured
-                        </span>
-                        <span class="security-badge">
-                            <i class="bi bi-envelope-check me-1"></i>No Spam
-                        </span>
+            <div class="col-lg-3 col-md-6">
+                <h6 class="footer-heading mb-4">Stay Updated</h6>
+                <p class="footer-newsletter-text mb-3">Subscribe to our newsletter for market insights and updates.</p>
+                <form class="newsletter-form">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Enter your email" aria-label="Email for newsletter">
+                        <button class="btn subscribe-btn" type="submit">Subscribe</button>
                     </div>
+                </form>
+                <div class="security-badge">
+                    <i class="bi bi-shield-check me-2"></i>
+                    SSL Secured Trading Platform
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Footer -->
         <hr class="footer-divider my-4">
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start">
-                <p class="mb-md-0 copyright-text">
-                    <i class="bi bi-c-circle me-1"></i><%= new Date().getFullYear() %> StockBull. All rights reserved.
-                </p>
-            </div>
-            <div class="col-md-6">
-                <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                    <a href="/privacy" class="footer-bottom-link">Privacy Policy</a>
-                    <a href="/terms" class="footer-bottom-link">Terms of Service</a>
-                    <a href="/cookies" class="footer-bottom-link">Cookie Policy</a>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="copyright-text mb-2 mb-md-0">
+                        &copy; <%= new Date().getFullYear() %> StockBull. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <div class="footer-bottom-links text-center text-md-end">
+                        <a href="/privacy" class="footer-bottom-link">Privacy Policy</a>
+                        <span class="separator mx-2">|</span>
+                        <a href="/terms" class="footer-bottom-link">Terms of Service</a>
+                        <span class="separator mx-2">|</span>
+                        <a href="/contact" class="footer-bottom-link">Contact Us</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,79 +105,71 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="help-content">
-                    <h6>How can we help you?</h6>
-                    <p>Browse through our help categories or contact our support team.</p>
-                    <!-- Add help center content here -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="help-category">
+                            <i class="bi bi-book text-primary mb-3"></i>
+                            <h6>Getting Started</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="#">Account Setup</a></li>
+                                <li><a href="#">Trading Basics</a></li>
+                                <li><a href="#">Platform Guide</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="help-category">
+                            <i class="bi bi-shield-check text-primary mb-3"></i>
+                            <h6>Security</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="#">Two-Factor Authentication</a></li>
+                                <li><a href="#">Password Reset</a></li>
+                                <li><a href="#">Security Tips</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="help-category">
+                            <i class="bi bi-wallet2 text-primary mb-3"></i>
+                            <h6>Payments & Withdrawals</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="#">Payment Methods</a></li>
+                                <li><a href="#">Withdrawal Process</a></li>
+                                <li><a href="#">Transaction Fees</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="help-category">
+                            <i class="bi bi-headset text-primary mb-3"></i>
+                            <h6>Support</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="#">Contact Support</a></li>
+                                <li><a href="#">FAQs</a></li>
+                                <li><a href="#">Submit Ticket</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Initialize scroll to top functionality -->
+<!-- Initialize Scroll to Top Button -->
 <script>
-document.getElementById('scrollTopBtn').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    
+    window.onscroll = function() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            scrollTopBtn.style.display = "block";
+        } else {
+            scrollTopBtn.style.display = "none";
+        }
+    };
 
-window.addEventListener('scroll', () => {
-    const scrollBtn = document.getElementById('scrollTopBtn');
-    if (document.documentElement.scrollTop > 200) {
-        scrollBtn.style.display = 'block';
-    } else {
-        scrollBtn.style.display = 'none';
-    }
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Newsletter Form Handling
-    const newsletterForm = document.getElementById('newsletterForm');
-    const newsletterMessage = document.querySelector('.newsletter-message');
-
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Subscribing...';
-            submitBtn.disabled = true;
-            
-            setTimeout(() => {
-                newsletterMessage.textContent = '✓ Successfully subscribed! Welcome aboard!';
-                newsletterMessage.style.color = '#198754';
-                this.reset();
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-                
-                setTimeout(() => {
-                    newsletterMessage.textContent = '';
-                }, 5000);
-            }, 1500);
-        });
-    }
-
-    // Help Modal Contact Support Button
-    const contactSupportBtn = document.querySelector('.modal-footer .btn-primary');
-    if (contactSupportBtn) {
-        contactSupportBtn.addEventListener('click', function() {
-            window.location.href = '/support';
-        });
-    }
-
-    // Add smooth scroll to all footer links
-    document.querySelectorAll('.footer a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-});
+    scrollTopBtn.onclick = function() {
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    };
 </script>

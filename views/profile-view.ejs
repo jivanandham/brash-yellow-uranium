@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/css/navbar.css">
   <link rel="stylesheet" href="/css/user-navbar.css">
   <link rel="stylesheet" href="/css/profile.css">
+  <link rel="stylesheet" href="/css/dashboard-header.css">
 </head>
 <body>
   <%- include('partials/navbar') %>
@@ -18,72 +19,78 @@
     <%- include('partials/user-navbar') %>
   <% } %>
 
-  <div class="profile-container">
-    <div class="profile-card">
-      <div class="profile-header">
-        <h2><i class="fas fa-user-circle"></i> Profile</h2>
-      </div>
+  <%- include('partials/dashboard-header', {
+    title: 'My Profile',
+    description: 'View and manage your account details',
+    showBalance: false,
+    actionButton: '<a href="/profile/edit" class="btn btn-light"><i class="bi bi-pencil"></i> Edit Profile</a>'
+  }) %>
 
-      <div class="profile-content">
-        <!-- Left side: Profile Information -->
-        <div class="profile-info">
-          <!-- Personal Information -->
-          <div class="info-section">
-            <div class="info-title">
-              <i class="fas fa-user"></i> Personal Information
-            </div>
-            <div class="info-item">
-              <span class="info-label">Name</span>
-              <span class="info-value"><%= user.name %></span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Email</span>
-              <span class="info-value"><%= user.email %></span>
-            </div>
-            <% if (user.bio) { %>
-              <div class="info-item">
-                <span class="info-label">Bio</span>
-                <span class="info-value"><%= user.bio %></span>
-              </div>
-            <% } %>
-            <% if (user.contactNumber) { %>
-              <div class="info-item">
-                <span class="info-label">Contact</span>
-                <span class="info-value"><%= user.contactNumber %></span>
-              </div>
-            <% } %>
-          </div>
-
-          <!-- Account Information -->
-          <div class="info-section">
-            <div class="info-title">
-              <i class="fas fa-shield-alt"></i> Account Information
-            </div>
-            <div class="info-item">
-              <span class="info-label">Account Type</span>
-              <span class="info-value">
-                <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
-                  <span class="role-badge admin">Administrator</span>
-                <% } else { %>
-                  <span class="role-badge user">User</span>
-                <% } %>
-              </span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Last Updated</span>
-              <span class="info-value"><%= user.formattedLastUpdate %></span>
-            </div>
-          </div>
+  <div class="container mt-4">
+    <div class="profile-container">
+      <div class="profile-card">
+        <div class="profile-header">
+          <h2><i class="fas fa-user-circle"></i> Profile</h2>
         </div>
 
-        <!-- Right side: Profile Picture -->
-        <div class="profile-img-section">
-          <div class="profile-img-container">
-            <img src="<%= user.picture || '/default-profile.png' %>" alt="Profile Picture" class="profile-img">
+        <div class="profile-content">
+          <!-- Left side: Profile Information -->
+          <div class="profile-info">
+            <!-- Personal Information -->
+            <div class="info-section">
+              <div class="info-title">
+                <i class="fas fa-user"></i> Personal Information
+              </div>
+              <div class="info-item">
+                <span class="info-label">Name</span>
+                <span class="info-value"><%= user.name %></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value"><%= user.email %></span>
+              </div>
+              <% if (user.bio) { %>
+                <div class="info-item">
+                  <span class="info-label">Bio</span>
+                  <span class="info-value"><%= user.bio %></span>
+                </div>
+              <% } %>
+              <% if (user.contactNumber) { %>
+                <div class="info-item">
+                  <span class="info-label">Contact</span>
+                  <span class="info-value"><%= user.contactNumber %></span>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Account Information -->
+            <div class="info-section">
+              <div class="info-title">
+                <i class="fas fa-shield-alt"></i> Account Information
+              </div>
+              <div class="info-item">
+                <span class="info-label">Account Type</span>
+                <span class="info-value">
+                  <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                    <span class="role-badge admin">Administrator</span>
+                  <% } else { %>
+                    <span class="role-badge user">User</span>
+                  <% } %>
+                </span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Last Updated</span>
+                <span class="info-value"><%= user.formattedLastUpdate %></span>
+              </div>
+            </div>
           </div>
-          <a href="/profile/edit" class="edit-profile-btn">
-            <i class="fas fa-edit"></i> Edit Profile
-          </a>
+
+          <!-- Right side: Profile Picture -->
+          <div class="profile-img-section">
+            <div class="profile-img-container">
+              <img src="<%= user.picture || '/default-profile.png' %>" alt="Profile Picture" class="profile-img">
+            </div>
+          </div>
         </div>
       </div>
     </div>

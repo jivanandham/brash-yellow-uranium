@@ -7,146 +7,204 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    .settings-page {
+      background-color: #f8f9fa;
       min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-
-    .container {
-      padding: 2rem 1rem;
-      max-width: 1200px;
+      padding: 2rem 0;
     }
 
     .page-header {
       margin-bottom: 2rem;
-      color: #2d3748;
     }
 
     .page-header h1 {
-      font-size: 2.5rem;
+      font-size: 2rem;
       font-weight: 600;
+      color: #2c3e50;
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .page-header p {
-      color: #718096;
+      color: #6c757d;
       font-size: 1.1rem;
       margin-bottom: 0;
     }
 
     .settings-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       margin-bottom: 2rem;
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .settings-card h2 {
-      color: #2d3748;
       font-size: 1.5rem;
+      color: #2c3e50;
       margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       padding-bottom: 1rem;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .settings-card h2 i {
+      color: #3498db;
     }
 
     .settings-section {
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
 
     .settings-section:last-child {
       margin-bottom: 0;
     }
 
+    .settings-section h3 {
+      font-size: 1.25rem;
+      color: #2c3e50;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .settings-section h3 i {
+      color: #3498db;
+      font-size: 1rem;
+    }
+
     .form-switch {
-      padding-left: 3em;
+      padding-left: 3.5rem;
+      margin-bottom: 1rem;
     }
 
     .form-switch .form-check-input {
-      width: 3em;
-      height: 1.5em;
-      margin-left: -3em;
+      width: 3rem;
+      height: 1.5rem;
+      margin-left: -3.5rem;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 1%29'/%3e%3c/svg%3e");
+      border: none;
+      background-color: #e9ecef;
     }
 
     .form-switch .form-check-input:checked {
-      background-color: #4299e1;
-      border-color: #4299e1;
+      background-color: #3498db;
+      border-color: #3498db;
+    }
+
+    .form-switch .form-check-label {
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .form-control, .form-select {
+      border: 1px solid #e9ecef;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      color: #2c3e50;
+      background-color: #f8f9fa;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
     }
 
     .notification-item {
-      padding: 1rem;
-      border-radius: 10px;
-      background: #f7fafc;
+      background: #f8f9fa;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
       margin-bottom: 1rem;
-      transition: all 0.3s ease;
+      border: 1px solid #e9ecef;
+      transition: all 0.2s ease;
     }
 
     .notification-item:hover {
-      background: #edf2f7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
-    .notification-item .notification-title {
+    .notification-title {
       font-weight: 600;
-      color: #2d3748;
+      color: #2c3e50;
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .notification-item .notification-meta {
+    .notification-title i {
+      color: #3498db;
+    }
+
+    .notification-meta {
+      color: #6c757d;
       font-size: 0.875rem;
-      color: #718096;
+      margin-bottom: 1rem;
     }
 
-    .notification-item .notification-actions {
-      margin-top: 1rem;
-    }
-
-    .btn-custom {
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
+    .btn-save {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
       font-weight: 500;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
 
-    .btn-custom:hover {
+    .btn-save:hover {
+      background-color: #2980b9;
       transform: translateY(-1px);
     }
 
-    .color-picker-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    .btn-save i {
+      margin-right: 0.5rem;
     }
 
-    .color-preview {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      border: 2px solid #e2e8f0;
+    .empty-notifications {
+      text-align: center;
+      padding: 2rem;
+      color: #6c757d;
+    }
+
+    .empty-notifications i {
+      font-size: 2.5rem;
+      color: #e9ecef;
+      margin-bottom: 1rem;
     }
 
     @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .page-header h1 {
-        font-size: 2rem;
+      .settings-page {
+        padding: 1rem 0;
       }
 
       .settings-card {
         padding: 1.5rem;
       }
+
+      .form-switch {
+        padding-left: 3rem;
+      }
     }
   </style>
 </head>
-<body>
+<body class="settings-page">
   <%- include('../partials/navbar') %>
   <%- include('../partials/admin-navbar') %>
 
   <div class="container">
     <div class="page-header">
-      <h1><i class="fas fa-cogs me-2"></i>System Settings</h1>
+      <h1>
+        <i class="fas fa-cogs text-primary"></i>
+        System Settings
+      </h1>
       <p>Configure system preferences and manage notifications</p>
     </div>
 
@@ -154,21 +212,27 @@
       <!-- System Settings -->
       <div class="col-lg-8">
         <div class="settings-card">
-          <h2><i class="fas fa-sliders-h me-2"></i>General Settings</h2>
+          <h2>
+            <i class="fas fa-sliders-h"></i>
+            General Settings
+          </h2>
           
           <form id="settingsForm" action="/admin/settings" method="POST">
             <!-- Email Notifications -->
             <div class="settings-section">
-              <h3 class="h5 mb-3">Email Notifications</h3>
-              <div class="mb-3 form-switch">
+              <h3>
+                <i class="fas fa-envelope"></i>
+                Email Notifications
+              </h3>
+              <div class="form-switch">
                 <input type="checkbox" class="form-check-input" id="newUserNotif" name="notifications.newUser" <%= settings.notifications.newUser ? 'checked' : '' %>>
                 <label class="form-check-label" for="newUserNotif">New user registrations</label>
               </div>
-              <div class="mb-3 form-switch">
+              <div class="form-switch">
                 <input type="checkbox" class="form-check-input" id="largeTransNotif" name="notifications.largeTransactions" <%= settings.notifications.largeTransactions ? 'checked' : '' %>>
                 <label class="form-check-label" for="largeTransNotif">Large transactions (over $1000)</label>
               </div>
-              <div class="mb-3 form-switch">
+              <div class="form-switch">
                 <input type="checkbox" class="form-check-input" id="systemAlertsNotif" name="notifications.systemAlerts" <%= settings.notifications.systemAlerts ? 'checked' : '' %>>
                 <label class="form-check-label" for="systemAlertsNotif">System alerts and warnings</label>
               </div>
@@ -176,12 +240,16 @@
 
             <!-- Security Settings -->
             <div class="settings-section">
-              <h3 class="h5 mb-3">Security</h3>
+              <h3>
+                <i class="fas fa-shield-alt"></i>
+                Security
+              </h3>
               <div class="mb-3">
                 <label class="form-label">Session Timeout (minutes)</label>
                 <input type="number" class="form-control" name="security.sessionTimeout" value="<%= settings.security.sessionTimeout %>" min="5" max="120">
+                <div class="form-text text-muted">Set how long users can remain inactive before being logged out</div>
               </div>
-              <div class="mb-3 form-switch">
+              <div class="form-switch">
                 <input type="checkbox" class="form-check-input" id="twoFactorAuth" name="security.twoFactorAuth" <%= settings.security.twoFactorAuth ? 'checked' : '' %>>
                 <label class="form-check-label" for="twoFactorAuth">Require 2FA for admin actions</label>
               </div>
@@ -189,149 +257,83 @@
 
             <!-- Display Settings -->
             <div class="settings-section">
-              <h3 class="h5 mb-3">Display</h3>
+              <h3>
+                <i class="fas fa-desktop"></i>
+                Display
+              </h3>
               <div class="mb-3">
                 <label class="form-label">Items per page</label>
                 <select class="form-select" name="display.itemsPerPage">
-                  <option value="10" <%= settings.display.itemsPerPage === 10 ? 'selected' : '' %>>10</option>
-                  <option value="25" <%= settings.display.itemsPerPage === 25 ? 'selected' : '' %>>25</option>
-                  <option value="50" <%= settings.display.itemsPerPage === 50 ? 'selected' : '' %>>50</option>
-                  <option value="100" <%= settings.display.itemsPerPage === 100 ? 'selected' : '' %>>100</option>
+                  <option value="10" <%= settings.display.itemsPerPage === 10 ? 'selected' : '' %>>10 items</option>
+                  <option value="25" <%= settings.display.itemsPerPage === 25 ? 'selected' : '' %>>25 items</option>
+                  <option value="50" <%= settings.display.itemsPerPage === 50 ? 'selected' : '' %>>50 items</option>
+                  <option value="100" <%= settings.display.itemsPerPage === 100 ? 'selected' : '' %>>100 items</option>
                 </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Theme Color</label>
-                <div class="color-picker-wrapper">
-                  <input type="color" class="form-control form-control-color" name="display.themeColor" value="<%= settings.display.themeColor %>" title="Choose theme color">
-                  <div class="color-preview" style="background-color: <%= settings.display.themeColor %>"></div>
-                </div>
+                <div class="form-text text-muted">Choose how many items to display per page in lists and tables</div>
               </div>
             </div>
 
-            <div class="text-end">
-              <button type="submit" class="btn btn-primary btn-custom">
-                <i class="fas fa-save me-2"></i>Save Settings
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+              <button type="submit" class="btn btn-save">
+                <i class="fas fa-save"></i>
+                Save Changes
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Notifications Panel -->
+      <!-- Recent Notifications -->
       <div class="col-lg-4">
         <div class="settings-card">
-          <h2><i class="fas fa-bell me-2"></i>Recent Notifications</h2>
+          <h2>
+            <i class="fas fa-bell"></i>
+            Recent Notifications
+          </h2>
           
           <% if (notifications && notifications.length > 0) { %>
             <% notifications.forEach(notification => { %>
               <div class="notification-item">
                 <div class="notification-title">
-                  <i class="<%= notification.icon %> me-2"></i>
+                  <i class="fas fa-<%= notification.type === 'success' ? 'check-circle' : notification.type === 'warning' ? 'exclamation-triangle' : 'info-circle' %>"></i>
                   <%= notification.title %>
                 </div>
                 <div class="notification-meta">
-                  <i class="fas fa-clock me-1"></i>
-                  <%= new Date(notification.date).toLocaleString() %>
+                  <%= new Date(notification.timestamp).toLocaleDateString() %> at <%= new Date(notification.timestamp).toLocaleTimeString() %>
                 </div>
-                <div class="notification-content mt-2">
+                <div class="notification-message">
                   <%= notification.message %>
                 </div>
-                <div class="notification-actions">
-                  <button class="btn btn-sm btn-outline-primary me-2" onclick="markAsRead('<%= notification._id %>')">
-                    <i class="fas fa-check me-1"></i>Mark as Read
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification('<%= notification._id %>')">
-                    <i class="fas fa-trash me-1"></i>Delete
-                  </button>
-                </div>
               </div>
-            <% }) %>
+            <% }); %>
           <% } else { %>
-            <div class="text-center text-muted py-4">
-              <i class="fas fa-bell-slash fa-3x mb-3"></i>
-              <p>No new notifications</p>
+            <div class="empty-notifications">
+              <i class="fas fa-bell-slash"></i>
+              <p>No recent notifications</p>
             </div>
           <% } %>
-
-          <div class="text-center mt-3">
-            <a href="/admin/notifications" class="btn btn-outline-primary btn-custom">
-              <i class="fas fa-list me-2"></i>View All Notifications
-            </a>
-          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <%- include('../partials/footer') %>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Update color preview when color picker changes
-    document.querySelector('input[type="color"]').addEventListener('input', function(e) {
-      document.querySelector('.color-preview').style.backgroundColor = e.target.value;
-    });
-
-    // Handle form submission
-    document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+    // Form submission handling
+    document.getElementById('settingsForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const formData = new FormData(this);
-      const settings = Object.fromEntries(formData);
+      
+      // Show loading state
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      submitBtn.disabled = true;
 
-      try {
-        const response = await fetch('/admin/settings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(settings)
-        });
-
-        if (response.ok) {
-          alert('Settings saved successfully!');
-        } else {
-          throw new Error('Failed to save settings');
-        }
-      } catch (error) {
-        console.error('Error saving settings:', error);
-        alert('Failed to save settings. Please try again.');
-      }
+      // Submit the form
+      this.submit();
     });
-
-    // Handle notification actions
-    async function markAsRead(notificationId) {
-      try {
-        const response = await fetch(`/admin/notifications/${notificationId}/read`, {
-          method: 'POST'
-        });
-
-        if (response.ok) {
-          location.reload();
-        } else {
-          throw new Error('Failed to mark notification as read');
-        }
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
-        alert('Failed to mark notification as read. Please try again.');
-      }
-    }
-
-    async function deleteNotification(notificationId) {
-      if (!confirm('Are you sure you want to delete this notification?')) return;
-
-      try {
-        const response = await fetch(`/admin/notifications/${notificationId}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          location.reload();
-        } else {
-          throw new Error('Failed to delete notification');
-        }
-      } catch (error) {
-        console.error('Error deleting notification:', error);
-        alert('Failed to delete notification. Please try again.');
-      }
-    }
   </script>
 </body>
 </html>

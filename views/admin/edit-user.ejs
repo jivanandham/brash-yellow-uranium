@@ -6,297 +6,245 @@
   <title>Edit User</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-
-    .container {
-      padding: 2rem 1rem;
-      max-width: 800px;
-    }
-
-    .page-header {
-      margin-bottom: 2rem;
-      color: #2d3748;
-    }
-
-    .page-header h1 {
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .page-header p {
-      color: #718096;
-      font-size: 1.1rem;
-      margin-bottom: 0;
-    }
-
-    .edit-form-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
-    }
-
-    .form-label {
-      font-weight: 500;
-      color: #4a5568;
-      margin-bottom: 0.5rem;
-    }
-
-    .form-control, .form-select {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .form-control[readonly] {
-      background-color: #f8fafc;
-      cursor: not-allowed;
-    }
-
-    .role-select {
-      position: relative;
-    }
-
-    .role-option {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .role-option:hover {
-      border-color: #667eea;
-      background-color: rgba(102, 126, 234, 0.05);
-    }
-
-    .role-option.selected {
-      border-color: #667eea;
-      background-color: rgba(102, 126, 234, 0.1);
-    }
-
-    .role-option input[type="radio"] {
-      display: none;
-    }
-
-    .role-icon {
-      font-size: 1.5rem;
-      margin-right: 1rem;
-      color: #667eea;
-    }
-
-    .role-info h4 {
-      margin: 0;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #2d3748;
-    }
-
-    .role-info p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #718096;
-    }
-
-    .alert {
-      border: none;
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .alert-danger {
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-      color: #dc2626;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    .btn {
-      padding: 0.75rem 2rem;
-      border-radius: 50px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-    }
-
-    .btn-secondary {
-      background: #e2e8f0;
-      border: none;
-      color: #4a5568;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .page-header h1 {
-        font-size: 2rem;
-      }
-
-      .edit-form-card {
-        padding: 1.5rem;
-      }
-
-      .btn-group {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header-footer.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/admin-navbar.css">
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
 </head>
 <body>
   <%- include('../partials/navbar') %>
   <%- include('../partials/admin-navbar') %>
 
-  <div class="container">
-    <div class="page-header">
-      <h1><i class="fas fa-user-edit me-2"></i>Edit User</h1>
-      <p>Update user information and permissions</p>
-    </div>
-
-    <div class="edit-form-card">
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger">
-          <i class="fas fa-exclamation-circle me-2"></i>
-          <%= error %>
-        </div>
-      <% } %>
-
-      <form action="/admin/users/<%= user._id %>/edit" method="POST" class="needs-validation" novalidate>
-        <div class="mb-4">
-          <label for="name" class="form-label">Full Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="name"
-            name="name"
-            value="<%= user.name %>"
-            required
-            placeholder="Enter user's full name"
-          />
-          <div class="invalid-feedback">Please enter a valid name.</div>
-        </div>
-
-        <div class="mb-4">
-          <label for="email" class="form-label">Email Address</label>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            name="email"
-            value="<%= user.email %>"
-            readonly
-          />
-          <small class="text-muted">Email address cannot be changed</small>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label">User Role</label>
-          <div class="role-select">
-            <label class="role-option <%= user.role === 'user' ? 'selected' : '' %>">
-              <input type="radio" name="role" value="user" <%= user.role === 'user' ? 'checked' : '' %>>
-              <div class="d-flex align-items-center">
-                <i class="fas fa-user role-icon"></i>
-                <div class="role-info">
-                  <h4>Standard User</h4>
-                  <p>Basic access to platform features</p>
-                </div>
-              </div>
-            </label>
-
-            <label class="role-option <%= user.role === 'admin' ? 'selected' : '' %>">
-              <input type="radio" name="role" value="admin" <%= user.role === 'admin' ? 'checked' : '' %>>
-              <div class="d-flex align-items-center">
-                <i class="fas fa-user-shield role-icon"></i>
-                <div class="role-info">
-                  <h4>Administrator</h4>
-                  <p>Full access to all platform features</p>
-                </div>
-              </div>
-            </label>
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="dashboard-card" data-aos="fade-up">
+          <div class="card-header">
+            <i class="fas fa-user-edit"></i>
+            <span class="badge bg-primary">Edit User</span>
           </div>
-        </div>
+          <h3>Edit User Information</h3>
+          
+          <form id="editUserForm" class="mt-4">
+            <input type="hidden" name="userId" value="<%= user._id %>">
+            
+            <!-- Basic Information -->
+            <div class="section-title">
+              <i class="fas fa-user"></i>
+              Basic Information
+            </div>
 
-        <div class="btn-group">
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i>
-            Save Changes
-          </button>
-          <a href="/admin/users" class="btn btn-secondary">
-            <i class="fas fa-times"></i>
-            Cancel
-          </a>
+            <div class="mb-4">
+              <label class="form-label">Full Name</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="text" class="form-control" name="name" value="<%= user.name %>" required>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Email</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
+              </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="section-title">
+              <i class="fas fa-cog"></i>
+              Account Settings
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Account Status</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                <select class="form-select" name="status">
+                  <option value="active" <%= user.status === 'active' ? 'selected' : '' %>>Active</option>
+                  <option value="inactive" <%= user.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                  <option value="suspended" <%= user.status === 'suspended' ? 'selected' : '' %>>Suspended</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Trading Limit</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                <input type="number" class="form-control" name="tradingLimit" value="<%= user.tradingLimit %>" min="0" step="1000">
+                <span class="input-group-text">USD</span>
+              </div>
+              <small class="text-muted">Maximum amount the user can trade</small>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="section-title">
+              <i class="fas fa-address-card"></i>
+              Contact Information
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Phone Number</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                <input type="tel" class="form-control" name="contactNumber" value="<%= user.contactNumber || '' %>" placeholder="Enter phone number">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Bio</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                <textarea class="form-control" name="bio" rows="3" placeholder="User biography"><%= user.bio || '' %></textarea>
+              </div>
+            </div>
+
+            <!-- Watchlist -->
+            <div class="section-title">
+              <i class="fas fa-star"></i>
+              Watchlist
+            </div>
+
+            <div class="watchlist-container mb-4">
+              <% if (user.watchlist && user.watchlist.length > 0) { %>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Symbol</th>
+                        <th>Added Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% user.watchlist.forEach(item => { %>
+                        <tr>
+                          <td><%= item.symbol %></td>
+                          <td><%= new Date(item.addedAt).toLocaleDateString() %></td>
+                          <td>
+                            <button type="button" class="btn btn-sm btn-danger remove-watchlist" data-symbol="<%= item.symbol %>">
+                              <i class="fas fa-trash-alt"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              <% } else { %>
+                <p class="text-muted">No items in watchlist</p>
+              <% } %>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="action-btn primary">
+                <i class="fas fa-save"></i>
+                Save Changes
+              </button>
+              <a href="/admin/users" class="action-btn secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+              </a>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
   <%- include('../partials/footer') %>
-
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
   <script>
-    // Form validation
-    (() => {
-      'use strict'
-      const forms = document.querySelectorAll('.needs-validation')
-      Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-          if (!form.checkValidity()) {
-            event.preventDefault()
-            event.stopPropagation()
-          }
-          form.classList.add('was-validated')
-        })
-      })
-    })()
+    AOS.init({
+      duration: 800,
+      once: true
+    });
 
-    // Role selection
-    document.querySelectorAll('.role-option').forEach(option => {
-      option.addEventListener('click', () => {
-        document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'))
-        option.classList.add('selected')
-        option.querySelector('input[type="radio"]').checked = true
-      })
-    })
+    // Form Submission
+    document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await fetch('/admin/users/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: formData.get('userId'),
+            name: formData.get('name'),
+            email: formData.get('email'),
+            status: formData.get('status'),
+            tradingLimit: formData.get('tradingLimit'),
+            contactNumber: formData.get('contactNumber'),
+            bio: formData.get('bio')
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showAlert('success', 'User updated successfully');
+          setTimeout(() => {
+            window.location.href = '/admin/users';
+          }, 1500);
+        } else {
+          showAlert('error', data.message || 'Failed to update user');
+        }
+      } catch (error) {
+        console.error('Error updating user:', error);
+        showAlert('error', 'Failed to update user');
+      }
+    });
+
+    // Remove from Watchlist
+    document.querySelectorAll('.remove-watchlist').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const symbol = e.currentTarget.dataset.symbol;
+        const userId = document.querySelector('input[name="userId"]').value;
+        
+        try {
+          const response = await fetch('/admin/users/watchlist/remove', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              userId,
+              symbol
+            })
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            e.currentTarget.closest('tr').remove();
+            showAlert('success', 'Symbol removed from watchlist');
+          } else {
+            showAlert('error', data.message || 'Failed to remove symbol');
+          }
+        } catch (error) {
+          console.error('Error removing symbol:', error);
+          showAlert('error', 'Failed to remove symbol');
+        }
+      });
+    });
+
+    // Alert function
+    function showAlert(type, message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      document.body.appendChild(alertDiv);
+      setTimeout(() => alertDiv.remove(), 5000);
+    }
   </script>
 </body>
 </html>

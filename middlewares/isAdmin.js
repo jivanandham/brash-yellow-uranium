@@ -1,24 +1,36 @@
-const User = require('../models/User'); // Adjust the path to your User model if necessary
+const User = require('../models/User');
 
 const isAdmin = async (req, res, next) => {
-      if (!req.oidc.isAuthenticated()) {
-        return res.status(401).send('Unauthorized: Please login.');
-      }
-    
-      const user = await User.findOne({ email: req.oidc.user.email });
-      if (user && user.role === 'admin') {
-        return next();
-      }
-    
-      res.status(403).send('Forbidden: Admins only.');
-    };
+  try {
+    if (!req.oidc || !req.oidc.isAuthenticated()) {
+      return res.redirect('/login');
+    }
 
-    module.exports = (req, res, next) => {
-      if (req.oidc && req.oidc.user && req.oidc.user.roles && req.oidc.user.roles.includes('admin')) {
-        return next(); // User is an admin
-      }
-      res.status(403).send('Access Denied: Admins Only'); // Restrict access
-    };
+    const user = await User.findOne({ email: req.oidc.user.email });
     
+    if (!user) {
+      return res.status(403).render('403', {
+        user: req.oidc.user,
+        message: 'User not found in database'
+      });
+    }
+
+    if (user.role !== 'admin') {
+      return res.status(403).render('403', {
+        user: req.oidc.user,
+        message: 'Access Denied: Admins Only'
+      });
+    }
+
+    // User is an admin, proceed
+    next();
+  } catch (error) {
+    console.error('Error in isAdmin middleware:', error);
+    res.status(500).render('error', {
+      user: req.oidc ? req.oidc.user : null,
+      error: 'Internal Server Error'
+    });
+  }
+};
 
 module.exports = isAdmin;

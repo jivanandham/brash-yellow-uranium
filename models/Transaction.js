@@ -26,6 +26,13 @@ const transactionSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
+    withdrawalMethod: {
+        type: String,
+        enum: ['bank_transfer', 'paypal', 'crypto'],
+        required: function() {
+            return this.type === 'withdraw';
+        }
+    },
     stockSymbol: { 
         type: String,
         required: function() { 
