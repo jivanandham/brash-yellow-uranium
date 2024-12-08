@@ -6,272 +6,86 @@
     <title>Security Dashboard - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        .container-fluid {
-            padding: 2rem 1rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .security-stats {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            padding: 2rem;
-            color: white;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .security-stats::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
-            transform: skewX(-30deg);
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin: 10px 0;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            height: 100%;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .stat-card h3 {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .stat-card h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 0;
-            color: white;
-        }
-
-        .filter-section {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-        }
-
-        .audit-log-container {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .audit-log-entry {
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
-        }
-
-        .audit-log-entry:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .audit-log-entry.high {
-            border-left: 4px solid #e53e3e;
-            background: rgba(229, 62, 62, 0.05);
-        }
-
-        .audit-log-entry.medium {
-            border-left: 4px solid #dd6b20;
-            background: rgba(221, 107, 32, 0.05);
-        }
-
-        .audit-log-entry.low {
-            border-left: 4px solid #38a169;
-            background: rgba(56, 161, 105, 0.05);
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #718096;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #a0aec0;
-            margin-bottom: 1rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 12px 24px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(66, 153, 225, 0.3);
-        }
-
-        .pagination {
-            margin-top: 30px;
-        }
-
-        .page-link {
-            color: #4a5568;
-            border-color: #e2e8f0;
-            padding: 0.5rem 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .page-link:hover {
-            color: #2d3748;
-            background-color: #edf2f7;
-            border-color: #cbd5e0;
-        }
-
-        .page-item.active .page-link {
-            background-color: #667eea;
-            border-color: #667eea;
-        }
-
-        .page-item.disabled .page-link {
-            color: #a0aec0;
-            background-color: #f7fafc;
-            border-color: #e2e8f0;
-        }
-
-        .severity-badge {
-            padding: 0.35rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 9999px;
-        }
-
-        .severity-high {
-            background-color: #FED7D7;
-            color: #C53030;
-        }
-
-        .severity-medium {
-            background-color: #FEEBC8;
-            color: #C05621;
-        }
-
-        .severity-low {
-            background-color: #C6F6D5;
-            color: #2F855A;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
+    <link rel="stylesheet" href="/css/security-dashboard.css">
 </head>
-<body class="bg-light">
+<body class="security-page">
     <%- include('../partials/navbar') %>
     <%- include('../partials/admin-navbar') %>
 
-    <div class="container-fluid py-4">
-        <div class="row mb-4">
+    <div class="container-fluid">
+        <div class="row">
             <div class="col">
-                <h1 class="h2 mb-4">
-                    <i class="fas fa-shield-alt me-2"></i>Security Dashboard
-                </h1>
+                <div class="page-header">
+                    <h1>
+                        <i class="fas fa-shield-alt"></i>
+                        Security Dashboard
+                    </h1>
+                    <p>Monitor system security and audit logs</p>
+                </div>
             </div>
         </div>
 
         <!-- Security Stats -->
-        <div class="row security-stats mb-4">
+        <div class="row g-3">
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-user-shield"></i>
-                    <h3 class="h5">Active Users</h3>
-                    <h2 class="mb-0"><%= stats.activeUsers %></h2>
+                    <h3>Active Users</h3>
+                    <h2><%= stats.activeUsers %></h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <h3 class="h5">Security Alerts</h3>
-                    <h2 class="mb-0"><%= stats.securityAlerts %></h2>
+                    <h3>Security Alerts</h3>
+                    <h2><%= stats.securityAlerts %></h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-shield-virus"></i>
-                    <h3 class="h5">Failed Logins</h3>
-                    <h2 class="mb-0"><%= stats.failedLogins %></h2>
+                    <h3>Failed Logins</h3>
+                    <h2><%= stats.failedLogins %></h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-lock"></i>
-                    <h3 class="h5">2FA Enabled</h3>
-                    <h2 class="mb-0"><%= stats.twoFactorEnabled %>%</h2>
+                    <h3>2FA Enabled</h3>
+                    <h2><%= stats.twoFactorEnabled %>%</h2>
                 </div>
             </div>
         </div>
 
         <!-- Charts Row -->
-        <div class="row mb-4">
+        <div class="row g-3 mt-3">
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h3 class="h5 mb-3">Login Attempts Over Time</h3>
+                    <h3>
+                        <i class="fas fa-chart-line"></i>
+                        Login Attempts Over Time
+                    </h3>
                     <canvas id="loginAttemptsChart"></canvas>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h3 class="h5 mb-3">Security Incidents by Type</h3>
+                    <h3>
+                        <i class="fas fa-chart-pie"></i>
+                        Security Incidents by Type
+                    </h3>
                     <canvas id="securityIncidentsChart"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Audit Logs Section -->
-        <div class="row">
+        <div class="row mt-3">
             <div class="col-12">
-                <div class="filter-section mb-4">
-                    <div class="row align-items-center">
+                <div class="filter-section">
+                    <div class="row g-3 align-items-end">
                         <div class="col-md-3">
                             <label class="form-label">Severity Level</label>
                             <select class="form-select" id="severityFilter">
@@ -292,73 +106,51 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Date Range</label>
-                            <input type="text" class="form-control date-range-picker" id="dateRange">
+                            <input type="text" class="form-control" id="dateRange">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">&nbsp;</label>
-                            <button class="btn btn-primary w-100" onclick="applyFilters()">
-                                <i class="fas fa-filter me-2"></i>Apply Filters
+                            <button class="btn btn-filter w-100" onclick="applyFilters()">
+                                <i class="fas fa-filter"></i>
+                                Apply Filters
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <div class="audit-log-container">
-                    <h3 class="h4 mb-4">Audit Logs</h3>
+                    <h3>
+                        <i class="fas fa-list"></i>
+                        Audit Logs
+                    </h3>
                     <div id="auditLogs">
                         <% if (auditLogs.length > 0) { %>
                             <% auditLogs.forEach(function(log) { %>
-                                <div class="audit-log-entry <%= log.severity %>">
+                                <div class="audit-log">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <h5 class="mb-1"><%= log.event %></h5>
-                                            <p class="mb-1 text-muted"><%= log.description %></p>
-                                            <small class="text-muted">
-                                                <i class="fas fa-clock me-1"></i>
-                                                <%= new Date(log.timestamp).toLocaleString() %>
-                                            </small>
+                                            <p class="mb-1"><%= log.description %></p>
+                                            <div class="audit-log-meta">
+                                                <span class="me-3">
+                                                    <i class="fas fa-user"></i>
+                                                    <%= log.user %>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-clock"></i>
+                                                    <%= moment(log.timestamp).fromNow() %>
+                                                </span>
+                                            </div>
                                         </div>
-                                        <span class="badge rounded-pill severity-<%= log.severity %>">
-                                            <%= log.severity.toUpperCase() %>
+                                        <span class="severity-badge severity-<%= log.severity %>">
+                                            <%= log.severity %>
                                         </span>
                                     </div>
                                 </div>
                             <% }); %>
-                            
-                            <!-- Pagination -->
-                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                <div class="text-muted">
-                                    Showing <%= (currentPage - 1) * itemsPerPage + 1 %> to 
-                                    <%= Math.min(currentPage * itemsPerPage, totalItems) %> of 
-                                    <%= totalItems %> entries
-                                </div>
-                                <nav aria-label="Audit logs pagination">
-                                    <ul class="pagination mb-0">
-                                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                                            <a class="page-link" href="?page=<%= currentPage - 1 %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>
-                                                Previous
-                                            </a>
-                                        </li>
-                                        
-                                        <% for(let i = 1; i <= totalPages; i++) { %>
-                                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                                            </li>
-                                        <% } %>
-                                        
-                                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                                            <a class="page-link" href="?page=<%= currentPage + 1 %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>
-                                                Next
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
                         <% } else { %>
-                            <div class="empty-state">
-                                <i class="fas fa-clipboard-list"></i>
-                                <h4>No Audit Logs Found</h4>
-                                <p class="text-muted">There are no audit logs to display at this time.</p>
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                                <p class="mb-0">No audit logs found</p>
                             </div>
                         <% } %>
                     </div>
@@ -367,58 +159,69 @@
         </div>
     </div>
 
+    <%- include('../partials/footer') %>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
-
     <script>
-        // Initialize date range picker
-        $(document).ready(function() {
-            $('#dateRange').daterangepicker({
-                startDate: moment().subtract(7, 'days'),
-                endDate: moment(),
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        // Initialize charts with a modern color scheme
+        const chartColors = ['#4a90e2', '#357abd', '#2c3e50', '#6c757d'];
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12
+                        }
+                    }
                 }
-            });
-        });
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        };
 
         // Login Attempts Chart
         const loginCtx = document.getElementById('loginAttemptsChart').getContext('2d');
         new Chart(loginCtx, {
             type: 'line',
             data: {
-                labels: <%= JSON.stringify(charts.loginAttempts.labels) %>,
+                labels: <%- JSON.stringify(loginAttempts.labels) %>,
                 datasets: [{
                     label: 'Successful Logins',
-                    data: <%= JSON.stringify(charts.loginAttempts.successful) %>,
-                    borderColor: '#48bb78',
-                    backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                    data: <%- JSON.stringify(loginAttempts.successful) %>,
+                    borderColor: chartColors[0],
+                    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
                     fill: true
                 }, {
                     label: 'Failed Logins',
-                    data: <%= JSON.stringify(charts.loginAttempts.failed) %>,
-                    borderColor: '#f56565',
-                    backgroundColor: 'rgba(245, 101, 101, 0.1)',
+                    data: <%- JSON.stringify(loginAttempts.failed) %>,
+                    borderColor: chartColors[2],
+                    backgroundColor: 'rgba(44, 62, 80, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
                     fill: true
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+            options: chartOptions
         });
 
         // Security Incidents Chart
@@ -426,15 +229,11 @@
         new Chart(incidentsCtx, {
             type: 'doughnut',
             data: {
-                labels: <%= JSON.stringify(charts.securityIncidents.labels) %>,
+                labels: <%- JSON.stringify(securityIncidents.labels) %>,
                 datasets: [{
-                    data: <%= JSON.stringify(charts.securityIncidents.data) %>,
-                    backgroundColor: [
-                        '#f56565',
-                        '#ed8936',
-                        '#ecc94b',
-                        '#48bb78'
-                    ]
+                    data: <%- JSON.stringify(securityIncidents.data) %>,
+                    backgroundColor: chartColors,
+                    borderWidth: 0
                 }]
             },
             options: {
@@ -442,7 +241,14 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right'
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
                     }
                 }
             }
@@ -453,12 +259,13 @@
             const eventType = document.getElementById('eventTypeFilter').value;
             const dateRange = document.getElementById('dateRange').value;
             
-            const params = new URLSearchParams(window.location.search);
-            if (severity) params.set('severity', severity);
-            if (eventType) params.set('eventType', eventType);
-            if (dateRange) params.set('dateRange', dateRange);
+            // Construct URL with filter parameters
+            const url = new URL(window.location.href);
+            if (severity) url.searchParams.set('severity', severity);
+            if (eventType) url.searchParams.set('eventType', eventType);
+            if (dateRange) url.searchParams.set('dateRange', dateRange);
             
-            window.location.href = `${window.location.pathname}?${params.toString()}`;
+            window.location.href = url.toString();
         }
     </script>
 </body>

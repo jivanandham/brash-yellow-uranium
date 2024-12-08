@@ -14,7 +14,7 @@
     .transactions-page {
       background-color: #f8f9fa;
       min-height: 100vh;
-      padding: 2rem 0;
+      padding: 0rem 0;
     }
 
     .stats-grid {
@@ -179,39 +179,100 @@
       color: white;
     }
 
-    .pagination {
-      padding: 1rem;
+    .pagination-wrapper {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
       background: white;
-      border-top: 1px solid #e9ecef;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
 
-    .page-link {
+    .pagination-info {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    .pagination {
+      margin: 0;
+      gap: 0.25rem;
+    }
+
+    .pagination .page-item {
+      margin: 0 1px;
+    }
+
+    .pagination .page-link {
+      min-width: 32px;
+      height: 32px;
+      padding: 0;
       border: none;
-      padding: 0.5rem 1rem;
-      color: #6c757d;
-      border-radius: 8px;
-      margin: 0 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a5568;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      background-color: transparent;
     }
 
-    .page-link:hover {
-      background: #4a90e2;
+    .pagination .page-link:hover {
+      background-color: #f1f5f9;
+      color: #1a202c;
+    }
+
+    .pagination .page-link:focus {
+      box-shadow: none;
+      background-color: #f1f5f9;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: #4a90e2;
       color: white;
+      font-weight: 600;
     }
 
-    .page-item.active .page-link {
-      background: #4a90e2;
-      color: white;
+    .pagination .page-item.disabled .page-link {
+      color: #94a3b8;
+      background-color: transparent;
+      cursor: not-allowed;
     }
 
-    .empty-state {
-      padding: 4rem 2rem;
-      text-align: center;
+    .pagination .page-link i {
+      font-size: 0.75rem;
+      line-height: 1;
     }
 
-    .empty-state-icon {
-      font-size: 4rem;
-      color: #6c757d;
-      margin-bottom: 1.5rem;
+    .per-page-selector .form-select {
+      min-width: 100px;
+      height: 32px;
+      padding: 0.25rem 2rem 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      border-color: #e2e8f0;
+      background-color: white;
+      cursor: pointer;
+    }
+
+    .per-page-selector .form-select:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .pagination .page-link {
+        min-width: 28px;
+        height: 28px;
+        font-size: 0.8125rem;
+      }
+
+      .pagination .page-link i {
+        font-size: 0.7rem;
+      }
+
+      .per-page-selector {
+        width: 80px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -395,20 +456,94 @@
         </table>
       </div>
 
-      <% if (transactions && transactions.length > 0) { %>
-        <nav class="pagination">
-          <ul class="pagination mb-0 justify-content-center">
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1">Previous</a>
-            </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-              <a class="page-link" href="#">Next</a>
-            </li>
-          </ul>
-        </nav>
+      <% if (pagination && pagination.totalPages > 1) { %>
+        <div class="pagination-wrapper mt-4">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="pagination-info">
+              Showing <strong><%= (pagination.currentPage - 1) * pagination.limit + 1 %></strong> to 
+              <strong><%= Math.min(pagination.currentPage * pagination.limit, pagination.totalItems) %></strong> of 
+              <strong><%= pagination.totalItems %></strong> transactions
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+              <div class="per-page-selector">
+                <select class="form-select form-select-sm" onchange="changePerPage(this.value)">
+                  <option value="10" <%= pagination.limit === 10 ? 'selected' : '' %>>10 per page</option>
+                  <option value="25" <%= pagination.limit === 25 ? 'selected' : '' %>>25 per page</option>
+                  <option value="50" <%= pagination.limit === 50 ? 'selected' : '' %>>50 per page</option>
+                  <option value="100" <%= pagination.limit === 100 ? 'selected' : '' %>>100 per page</option>
+                </select>
+              </div>
+              
+              <nav aria-label="Transaction pagination">
+                <ul class="pagination mb-0">
+                  <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=1" aria-label="First page">
+                      <i class="fas fa-angle-double-left"></i>
+                    </a>
+                  </li>
+                  <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= pagination.currentPage - 1 %>" aria-label="Previous page">
+                      <i class="fas fa-angle-left"></i>
+                    </a>
+                  </li>
+                  
+                  <% 
+                  const totalPages = pagination.totalPages;
+                  const currentPage = pagination.currentPage;
+                  const delta = 2;
+                  let range = [];
+                  let rangeWithDots = [];
+                  let l;
+                  
+                  for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+                      range.push(i);
+                    }
+                  }
+                  
+                  range.sort((a, b) => a - b);
+                  
+                  for (let i of range) {
+                    if (l) {
+                      if (i - l === 2) {
+                        rangeWithDots.push(l + 1);
+                      } else if (i - l !== 1) {
+                        rangeWithDots.push('...');
+                      }
+                    }
+                    rangeWithDots.push(i);
+                    l = i;
+                  }
+                  %>
+                  
+                  <% for (let i of rangeWithDots) { %>
+                    <% if (i === '...') { %>
+                      <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                      </li>
+                    <% } else { %>
+                      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                      </li>
+                    <% } %>
+                  <% } %>
+                  
+                  <li class="page-item <%= pagination.currentPage === totalPages ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= pagination.currentPage + 1 %>" aria-label="Next page">
+                      <i class="fas fa-angle-right"></i>
+                    </a>
+                  </li>
+                  <li class="page-item <%= pagination.currentPage === totalPages ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= totalPages %>" aria-label="Last page">
+                      <i class="fas fa-angle-double-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
       <% } %>
     </div>
   </div>
@@ -424,6 +559,13 @@
     function downloadReceipt(transactionId) {
       // Implement download receipt functionality
       console.log('Download receipt for transaction:', transactionId);
+    }
+
+    function changePerPage(limit) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('limit', limit);
+      currentUrl.searchParams.set('page', '1'); // Reset to first page when changing limit
+      window.location.href = currentUrl.toString();
     }
   </script>
 </body>

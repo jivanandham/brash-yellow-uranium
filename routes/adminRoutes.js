@@ -546,7 +546,7 @@ router.get('/error-logs', isAdmin, async (req, res) => {
 router.get('/user-transactions', isAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     // Build filter conditions
@@ -572,8 +572,8 @@ router.get('/user-transactions', isAdmin, async (req, res) => {
       .lean();
 
     // Get total count for pagination
-    const totalCount = await Transaction.countDocuments(filter);
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalItems = await Transaction.countDocuments(filter);
+    const totalPages = Math.ceil(totalItems / limit);
 
     // Calculate statistics
     const stats = await Transaction.aggregate([
@@ -597,8 +597,12 @@ router.get('/user-transactions', isAdmin, async (req, res) => {
 
     res.render('admin/user-transactions', {
       transactions,
-      currentPage: page,
-      totalPages,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        limit
+      },
       stats: stats[0] || {},
       users,
       transactionTypes,
@@ -782,6 +786,46 @@ router.get('/security', isAdmin, async (req, res) => {
         const limit = 10;
         const skip = (page - 1) * limit;
 
+        // Get current date and date 7 days ago for login attempts chart
+        const currentDate = new Date();
+        const sevenDaysAgo = new Date(currentDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+        // Fetch audit logs for login attempts
+        const loginAuditLogs = await AuditLog.find({
+            eventType: { $in: ['LOGIN_SUCCESS', 'LOGIN_FAILED'] },
+            timestamp: { $gte: sevenDaysAgo }
+        }).sort({ timestamp: 1 });
+
+        // Process login attempts data
+        const loginAttempts = {
+            labels: [],
+            successful: [],
+            failed: []
+        };
+
+        // Create arrays for the last 7 days
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(sevenDaysAgo.getTime() + (i * 24 * 60 * 60 * 1000));
+            const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            loginAttempts.labels.push(dateStr);
+            loginAttempts.successful.push(0);
+            loginAttempts.failed.push(0);
+        }
+
+        // Fill in the actual data
+        loginAuditLogs.forEach(log => {
+            const logDate = new Date(log.timestamp);
+            const dayIndex = Math.floor((logDate - sevenDaysAgo) / (24 * 60 * 60 * 1000));
+            if (dayIndex >= 0 && dayIndex < 7) {
+                if (log.eventType === 'LOGIN_SUCCESS') {
+                    loginAttempts.successful[dayIndex]++;
+                } else {
+                    loginAttempts.failed[dayIndex]++;
+                }
+            }
+        });
+
+        // Fetch other required data
         // Build filter query
         const query = {};
         if (req.query.severity) query.severity = req.query.severity;
@@ -837,11 +881,7 @@ router.get('/security', isAdmin, async (req, res) => {
 
         // Format chart data
         const chartData = {
-            loginAttempts: {
-                labels: [],
-                successful: [],
-                failed: []
-            },
+            loginAttempts: loginAttempts,
             securityIncidents: {
                 labels: [],
                 data: []
